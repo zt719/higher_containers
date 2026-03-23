@@ -1,0 +1,12 @@
+We have:
+
+1. Definition of HCont
+2. Construction of 2W
+3. Impossible of 3W
+
+Talk about:
+
+4. STLC
+5. 2M (even the example)
+6. HFunc
+7. System F-omega

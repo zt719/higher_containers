@@ -1,13 +1,12 @@
-.DS_Store
 *.agdai
 *.aux
 *.bbl
 *.blg
+*.DS_Store
 *.fdb_latexmk
 *.fls
-*.ptb
-*.log
-*.pdf
+*.hd
 *.log
 *.out
-*.tex
+*.pdf
+*.ptb

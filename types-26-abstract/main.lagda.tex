@@ -95,8 +95,9 @@
 module main where
 \end{code}
 
+\paragraph{Containers} 
 Strictly positive types can be represented as containers \cite{containers},
-that is \texttt{S : Set} and a family of positions \texttt{P : S → Set} giving rise to a
+that is, a shape \texttt{S : Set} and a family of positions \texttt{P : S → Set} giving rise to a
 functor \texttt{⟦ S ◃ P ⟧ : Set ⇒ Set}. Every container has an initial algebra
 (The W-type) and a terminal coalgebra (The M-type). However, there are
 inductive/coinductive types which do not fit the scheme of W-types/M-types.
@@ -109,53 +110,52 @@ data Bush (A : Set) : Set where
 \end{code}
 
 Even though \texttt{Bush A} is not a W-type, the type constructor \texttt{Bush} itself arises
-as the initial algebra of a functor on a functor category\cite{bird1998nested,
+as the initial algebra of a functor on a functor category \cite{bird1998nested,
 bird1999generalised}. This motivates the development of a notion of containers
 at higher kinds (such as \texttt{(* ⇒ *) ⇒ (* ⇒ *)} or \texttt{(* ⇒ *) ⇒ *}) capable of modelling
 strictly positive functors over containers.
 
-\subsection*{Second-Order Containers}
 
-We introduce a recursive syntax \texttt{2Cont} by extending the \texttt{Cont} with a family
+\paragraph{Second-Order Containers}
+We introduce a recursive syntax \texttt{2Cont} by extending normal containers with a family
 \texttt{PF : S → Set} of positions of \texttt{F} and an inductive continuation \texttt{RF : (s : S) → PF s → 2Cont}.
-These, second order containers are of kind \texttt{(* ⇒ *) ⇒ (* ⇒ *)}. Hence, each of them gives rise to an endofunctor \texttt{⟦ S ◃ PX ◃ PF ◃ RF ⟧ : Cont ⇒ Cont}.
+These, second-order containers are of kind \texttt{(* ⇒ *) ⇒ (* ⇒ *)}. Hence, each of them gives rise to an endofunctor \texttt{⟦ S ◃ PX ◃ PF ◃ RF ⟧ : Cont ⇒ Cont}.
 
 The \texttt{Bush} example can be specified using the following higher-order signature:
 \texttt{H F X = 1 + X × F (F X)}. There is a sum involved and therefore two shapes
 (\texttt{S = Bool}). The left shape is trivial with a constant, while in the right
 shape, there is one position of \texttt{X} (\texttt{PX true = ⊤}) and one position of
-\texttt{F} (\texttt{PF true = ⊤}). Finally, we need to model \texttt{H' F X = F X} which proceeds
-recursively (\texttt{RF true tt = H'}).
+\texttt{F} (\texttt{PF true = ⊤}). Finally, we need to model another second-order container
+\texttt{H' F X = F X} which proceeds recursively (\texttt{RF true tt = H'}).
 
-We define a second-order least-fixpoint operator \texttt{2W : 2Cont → Cont} by
+We define a second-order least fixpoint operator \texttt{2W : 2Cont → Cont} by
 induction-recursion, thereby recovering \texttt{Bush} as the initial algebra of
-\texttt{H}. However, attempts to define a greatest fixpoint operator
-\texttt{2M : 2Cont → Cont} by coinduction-induction shows positivity issue.
+\texttt{H}. The second-order greatest fixpoint perator \texttt{2M : 2Cont → Cont} 
+can be derived similarly but using coinduction-induction.
 
-\subsection*{Higher-Order Containers}
-
+\paragraph{Higher-Order Containers}
 To continue the story of constructing strictly positive functors of functor
-categories, we define a notion of higher container \texttt{HCont : Ty → Set}, where
+categories, we define a notion of higher-order container \texttt{HCont : Ty → Set}, where
 \texttt{Ty} are just the types of simply typed $\lambda$-calculus with one base type
-\texttt{*} which represents \texttt{Set}. \texttt{HCont} is just a special case of
+\texttt{*}, which represents \texttt{Set}. \texttt{HCont} is just a special case of
 \texttt{Nf : Con → Ty → Set} where \texttt{Con} are the contexts of simply typed
-$\lambda$-calculus \texttt{HCont A = Nf • A}. We also use \texttt{Var : Con → Ty → Set}
+$\lambda$-calculus: \texttt{HCont A = Nf • A}. We also use \texttt{Var : Con → Ty → Set}
 for the typed de Bruijn variables. For brevity, we do not present the full
-syntax. We remark that normal forms |Nf| are defined mutually with neutral terms
+syntax. We remark that normal forms \texttt{Nf} are defined mutually with neutral terms
 and spines, following the standard presentation of hereditary substitution for
-simply typed $\lambda$-calculus\cite{keller2010normalization}. With this setting,
+simply typed $\lambda$-calculus \cite{keller2010normalization}. With this setting,
 it is easy to see that \texttt{Set ≅ HCont *}, \texttt{Cont ≅ HCont (* ⇒ *)} and
 \texttt{2Cont ≅ HCont ((* ⇒ *) ⇒ * ⇒ *)}. 
 
-We can interpret every higher container as a function on types, \texttt{⟦\_⟧ :
+We can interpret every higher-order container as a function on types, \texttt{⟦\_⟧ :
 HCont A → ⟦ A ⟧T} where \texttt{⟦\_⟧T  : Ty → Set₁} is the obvious
 interpretation of types (with \texttt{⟦ * ⟧T = Set}). We believe that this can
-be extended to heredetary functors.
+be extended to hereditary functors.
 
 However, using this semantics
-we can show that there is no third order fixed-point operators, \texttt{3W}.
-Consider the following higher order container
-\footnote{This is the corresponding $\lambda$-term, the actual encoding is not very readable.}:
+we can show that there is no third-order fixed-point operator, \texttt{3W}.
+Consider the following higher-order container\footnote{This is the corresponding 
+$\lambda$-term, the actual encoding is not very readable.}:
 
 \begin{code}[hide]
 infixr 20 _⇒_
@@ -174,22 +174,22 @@ CC : ((Set → Set) → Set) → (Set → Set) → Set
 CC F G = G (F G)
 \end{code}
 
+\noindent
 If an external fixpoint operator \texttt{3W : HCont (((* ⇒ *) ⇒ *) ⇒ (* ⇒ *) ⇒ *) → HCont ((* ⇒ *) ⇒ *)}
 exists, applying it to \texttt{C} leads to an internal fixpoint operator \texttt{intW : HCont ((* ⇒ *) ⇒ *)}.
-According to the semantics, \texttt{intW : (Set ⇒ Set) ⇒ Set} gives a least fixpoint of any functor, but we know such thing does not
+According to the semantics, \texttt{intW : (Set ⇒ Set) ⇒ Set} gives a least fixpoint of any functor, but we know such a thing does not
 exist.
 
 We would like to incorporate initial algebras and terminal coalgebras
 at any type either by adding explicit fixpoint operators or by
-allowing infinite terms (i.e. using a coinductively defined syntax)
+allowing infinite terms (i.e. using a coinductively defined syntax).
 In either case we will have to give up the naive semantics sketched
 above. 
 
-\section*{Higher containers as normalized $\lambda$-terms}
-
-Furthermore, we show higher containers are normalized $\lambda$-terms
-closed under arbitrary products and coproducts (maybe also under least-fixpoint and
-greatest-fixpoint). That is we define a syntax:
+\paragraph{Higher-Order Containers as normalized $\lambda$-terms with $\Pi$ and $\Sigma$} 
+Furthermore, we show higher-order containers are normalized $\lambda$-terms
+closed under arbitrary products and coproducts (maybe also under least fixpoint and
+greatest fixpoint). That is, we define a syntax:
 
 \begin{code}[hide]
 infixl 5 _▹_
@@ -213,12 +213,20 @@ data Tm : Con → Ty → Set₁ where
   Σ : (I : Set) → (I → Tm Γ A) → Tm Γ A
 \end{code}
 
-together with a normalization function \texttt{nf : Tm Γ A → Nf Γ A}.
+\noindent
+together with a normalization function \texttt{nf : Tm Γ A → Nf Γ A}, 
+which performs $\beta$-reduction and container normalization at the same time.
+This mechanism allows one to derive higher-order container by spelling out its signature.
 
 We also show \texttt{(Con, Tms, Ty, Tm)} is a model of simply-typed
 $\lambda$-calculus (STLC), where \texttt{Tms} is a list of \texttt{Tm}. Similarly, we hope
 to prove that the normalized model \texttt{(Con, Nfs, Ty, Nf)} is also a model of STLC, where
 \texttt{Nfs} is a list of \texttt{Nf}.
+
+\paragraph{Conclusion and Future Work}
+Using Agda, we have formalized the syntax and semantics of second-order containers, including their least and greatest fixpoints. We have also derived a corresponding syntax for higher-order containers. However, this work remains ongoing, and several open questions persist.
+
+In particular, we aim to demonstrate that the \texttt{W}-type remains sufficient. Specifically, for the second-order case, we conjecture that \texttt{2W} can be reduced to the first-order \texttt{W}, analogously to reducing \texttt{2M} to \texttt{M}. Additionally, we plan to develop a semantics for higher-order containers, together with their fixpoints and recursors.
 
 \bibliographystyle{plain}
 \bibliography{references}

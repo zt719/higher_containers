@@ -1,0 +1,496 @@
+\documentclass{beamer}
+
+\usepackage{tikz}
+\usetheme{Madrid}
+\usecolortheme{beaver}
+
+\usepackage{fontspec}
+\setmonofont{JuliaMono-Regular.ttf}[Scale = 0.7]
+
+\usepackage{amsmath,amssymb}
+\usepackage{tikz-cd}
+\usepackage{verbatim}
+\usepackage{xcolor}
+
+\title[Containers in Higher Kinds]
+{Containers in Higher Kinds}
+\author[Tian, Altenkirch, Gylterud]
+{
+  \textbf{Zhili Tian}\inst{1} 
+  \and Thorsten Altenkirch\inst{1}\\
+  \and Håkon Robbestad Gylterud\inst{2}
+}
+
+\institute[]
+{
+  \inst{1}%
+  Functional Programming Lab\\
+  School of Computer Science\\
+  University of Nottingham
+  \and
+  \inst{2}%
+  Department of Informatics\\
+  University of Bergen
+}
+
+\date[TYPES 2026] % (optional)
+{TYPES, May 2026}
+
+\begin{document}
+\frame{\titlepage}
+
+\begin{frame}[fragile]{Old Story}
+
+\begin{block}{Theorem}
+Inductive types can be modeled as initial F-algebras.
+\end{block}
+
+\begin{exampleblock}{}
+  \begin{columns}[c,onlytextwidth]
+    \begin{column}{0.5\textwidth}
+    \begin{verbatim}  
+    data ℕ : Set where
+      zero : ℕ
+      suc  : ℕ → ℕ
+
+    foldℕ : {A : Set}
+      → (⊤ ⊎ A → A) → ℕ → A
+    foldℕ α zero = α (inj₁ tt)
+    foldℕ α (suc n) = α (inj₂ (foldℕ α n))
+    \end{verbatim}
+    \end{column}
+
+    \begin{column}{0.5\textwidth}
+    \begin{tikzcd}[column sep=huge]
+      \texttt{⊤ ⊎ ℕ} \arrow[r , "\texttt{⊤⊎ (foldℕ α)}"] \arrow[d , "\texttt{[zero,suc]}"] & \texttt{⊤ ⊎ A} \arrow[d, "\texttt{α}"] \\
+      \texttt{ℕ} \arrow[r , "\texttt{foldℕ α}"] & \texttt{A}
+    \end{tikzcd}
+    \end{column}
+  \end{columns}
+\end{exampleblock}
+
+\end{frame}
+
+\begin{frame}[fragile]{Old Story}
+
+\begin{block}{Definition}
+\textbf{Containers} correspond to polynomial functors:
+\[ X \mapsto \sum_{s \in S} X^{P(s)} \]
+\end{block}
+
+\begin{exampleblock}{}
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.35\textwidth}
+    \begin{verbatim}
+    record Cont : Set₁ where
+      constructor _◃_
+      field
+        S : Set
+        P : S → Set
+    \end{verbatim}
+    \end{column}
+
+    \begin{column}{0.60\textwidth}
+    \begin{verbatim}
+    ⟦_⟧ : Cont → Set → Set
+    ⟦ S ◃ P ⟧ X = Σ[ s ∈ S ] (P s → X)
+
+    ⟦_⟧₁ : (SP : Cont) → (X → Y) 
+      → ⟦ SP ⟧ X → ⟦ SP ⟧ Y
+    ⟦ SP ⟧₁ g (s , f) = s , g ∘ f
+    \end{verbatim}
+    \end{column}
+  \end{columns}
+\end{exampleblock}
+\end{frame}
+
+\begin{frame}[fragile]{Old Story}
+
+\begin{block}{Definition}
+\textbf{W-types} correspond to all strictly positive inductive types.
+They are the initial algebras (least fixpoints) of containers.
+\end{block}
+
+\begin{exampleblock}{}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+    \begin{verbatim}  
+    data W (SP : Cont) : Set where
+      sup : ⟦ SP ⟧ (W SP) → W SP
+
+    foldW : {SP : Cont} {X : Set}
+      → (⟦ SP ⟧ X → X) → W SP → X
+    foldW α (sup (s , f)) = α (s , foldW α ∘ f)
+    \end{verbatim}
+    \end{column}
+
+    \begin{column}{0.5\textwidth}
+      \begin{tikzcd}[column sep=huge]
+        \texttt{⟦ SP ⟧ (W SP)} \arrow[r , "\texttt{⟦ SP ⟧₁ (foldW α)}"] \arrow[d , "\texttt{sup}"] & \texttt{⟦ SP ⟧ A} \arrow[d, "\texttt{α}"] \\
+        \texttt{W SP} \arrow[r , "\texttt{foldW α}"] & \texttt{A}
+      \end{tikzcd}
+    \end{column}
+  \end{columns}
+\end{exampleblock}
+\end{frame}
+
+\begin{frame}[fragile]{More Types}
+
+What about types like \texttt{List}?
+
+\begin{exampleblock}{}
+\begin{verbatim}
+data List (A : Set) : Set where
+  [] : List A
+  _∷_ : A → List A → List A
+\end{verbatim}
+\end{exampleblock}
+
+If we fix the type \texttt{A}, then signature is:
+
+\begin{exampleblock}{}
+\begin{verbatim}
+ListASig : (A : Set) → Set → Set
+ListASig A X = ⊤ ⊎ A × X
+\end{verbatim}
+\end{exampleblock}
+\end{frame}
+
+\begin{frame}[fragile]{More Types}
+
+What about types like \texttt{Bush}? (legit Agda definition btw)
+
+\begin{exampleblock}{}
+\begin{verbatim}
+data Bush (A : Set) : Set where
+  [] : Bush A
+  _∷_ : A → Bush (Bush A) → Bush A
+\end{verbatim}
+\end{exampleblock}
+
+If we fix the type \texttt{A}, then signature is:
+
+\begin{exampleblock}{}
+\begin{verbatim}
+BushASig : (A : Set) → Set → Set
+BushASig A X = ⊤ ⊎ A × ???
+\end{verbatim}
+\end{exampleblock}
+
+\pause
+Let's try to take \texttt{Bush} and \texttt{A} separately:
+
+\begin{exampleblock}{}
+\begin{verbatim}
+BushSig : (Set → Set) → Set → Set
+BushSig F X = ⊤ ⊎ F (F X) × X
+\end{verbatim}
+\end{exampleblock}
+\end{frame}
+
+\begin{frame}[fragile]{2nd-Order Functors}
+
+\begin{block}{Definition}
+A \textbf{2nd-order functor} has all following constructions:
+\end{block}
+
+\pause
+\begin{exampleblock}{}
+\begin{verbatim}
+H : (Set → Set) → Set → Set
+H F X = ⊤ ⊎ F (F X) × X
+\end{verbatim}
+\end{exampleblock}
+
+\pause
+\begin{exampleblock}{}
+\begin{verbatim}
+ℍ : Func → Func
+ℍ (F , F₁) = H F , HF₁ where
+  HF₁ : (X → Y) → H F X → H F Y
+  HF₁ = ...
+
+ℍ₁ : {𝔽 𝔾 : Func} → Nat 𝔽 𝔾 → Nat (ℍ 𝔽) (ℍ 𝔾)
+ℍ₁ = ...
+\end{verbatim}
+\end{exampleblock}
+\end{frame}
+
+\begin{frame}[fragile]{2nd-Order Containers}
+
+\begin{block}{Definition}
+A \textbf{2nd-order container} is given by a shape, positions of both \texttt{X} and \texttt{F},
+and recurively, other 2nd-order container for each position of \texttt{F}.
+\end{block}
+
+\begin{exampleblock}{}
+\begin{verbatim}
+record 2Cont : Set₁ where
+  pattern
+  inductive
+  field
+    S : Set
+    PX : S → Set
+    PF : S → Set
+    RF : (s : S) → PF s → 2Cont
+\end{verbatim}
+\end{exampleblock}
+\end{frame}
+
+\begin{frame}[fragile]{2nd-Order Containers to Functors}
+
+Function interpretation:
+
+\begin{exampleblock}{}
+\begin{verbatim}
+2⟦_⟧ : 2Cont → (Set → Set) → Set → Set
+2⟦ S ◃ PX + PF + RF ⟧ F X = 
+  Σ[ s ∈ S ] ((PX s → X) × ((pF : PF s) → F (2⟦ RF s pF ⟧ F X)))
+\end{verbatim}
+\end{exampleblock}
+
+\pause
+Functor of $\textbf{\underline{[Set,Set]}}$ interpretation:
+
+\begin{exampleblock}{}
+\begin{verbatim}
+2⟦_⟧F : 2Cont → Func → Func
+2⟦_⟧F₁ : 2Cont → {𝔽 𝔾 : Func} → Nat 𝔽 𝔾 → Nat (ℍ 𝔽) (ℍ 𝔾)
+\end{verbatim}
+\end{exampleblock}
+\end{frame}
+
+\begin{frame}[fragile]{Initial 2nd-Order Algbra}
+
+\begin{block}{Definition}
+\textbf{2nd-order W-types} correspond to all strictly positive inductive types with kinds \texttt{(Set → Set)}. They are the initial algebras (least fixpoint) of 2nd-order containers.
+\end{block}
+
+\begin{exampleblock}{}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+    \begin{verbatim}  
+    2W : 2Cont → Func
+
+    2sup : {H : 2Cont} 
+      → NatTrans (2⟦ H ⟧F (2W H)) (2W H)
+
+    fold2W : {𝔽 : Func} {H : 2Cont} 
+      → NatTrans (2⟦ H ⟧ 𝔽) 𝔽
+      → NatTrans (2W H) 𝔽
+    \end{verbatim}
+    \end{column}
+
+    \begin{column}{0.5\textwidth}
+      \begin{tikzcd}[column sep=huge]
+        \texttt{2⟦ H ⟧F (2W H)} \arrow[r , "\texttt{2⟦ H ⟧F₁ (fold2W α)}"] \arrow[d , "\texttt{2sup}"] & \texttt{2⟦ H ⟧F 𝔽} \arrow[d, "\texttt{α}"] \\
+        \texttt{2W H} \arrow[r , "\texttt{fold2W α}"] & \texttt{𝔽}
+      \end{tikzcd}
+    \end{column}
+  \end{columns}
+\end{exampleblock}
+\end{frame}
+
+\begin{frame}[fragile]{More Types}
+
+What about types like monad transformers?
+
+\begin{exampleblock}{}
+\begin{verbatim}
+record MaybeT (M : Set → Set) (X : Set) : Set where
+  field
+    runMaybeT : M (Maybe X)
+\end{verbatim}
+\end{exampleblock}
+
+Its signature is in even higher kinds:
+
+\begin{exampleblock}{}
+\begin{verbatim}
+SigMaybeT : ((Set → Set) → Set → Set) → (Set → Set) → Set → Set
+SigMaybeT _ M X = M (⊤ ⊎ X)
+\end{verbatim}
+\end{exampleblock}
+\end{frame}
+
+\begin{frame}[fragile]{Higher Kinds}
+
+Syntax and semantics of kinds:
+
+\begin{exampleblock}{}
+\begin{verbatim}
+data Kind : Set where
+  * : Kind
+  _⇒_ : Kind → Kind → Kind
+
+⟦_⟧K : Kind → Set₁
+⟦ * ⟧K = Set
+⟦ A ⇒ B ⟧K = ⟦ A ⟧K → ⟦ B ⟧K
+\end{verbatim}
+\end{exampleblock}
+
+\end{frame}
+
+\begin{frame}[fragile]{Hereditary Functors}
+
+\textbf{Hereditary functors} and \textbf{hereditary categories} are mutually defined:
+
+\begin{exampleblock}{}
+\begin{verbatim}
+isHFunc : ⟦ A ⟧K → Set₁
+isHFunc = ...
+
+HFunc : Kind → Set₁
+HFunc A = Σ (⟦ A ⟧K) isHFunc
+
+HCat : Kind → Cat
+HCat A = record { Obj = HFunc A ; Mor = NatTrans ; ... }
+\end{verbatim}
+\end{exampleblock}
+
+\pause
+\begin{alertblock}{Note}
+Hereditary categories are not freely generated functor categories!
+\end{alertblock}
+
+\end{frame}
+
+\begin{frame}[fragile]{Hereditary Containers}
+
+Unnormalized syntax ($\lambda$-terms + polynomials)
+
+\begin{exampleblock}{}
+\begin{verbatim}
+data Tm : Con → Kind → Set₁ where
+  var : Var Γ A → Tm Γ A
+  lam : Tm (Γ ▹ A) B → Tm Γ (A ⇒ B)
+  app : Tm Γ (A ⇒ B) → Tm Γ A → Tm Γ B
+  Π : (I : Set) → (I → Tm Γ A) → Tm Γ A
+  Σ : (I : Set) → (I → Tm Γ A) → Tm Γ A
+\end{verbatim}
+\end{exampleblock}
+\end{frame}
+
+\begin{frame}[fragile]{Normalization}
+
+Normalizing function:
+
+\begin{exampleblock}{}
+\begin{verbatim}
+nf : Tm Γ A → Nf Γ A
+nf = ...
+\end{verbatim}
+\end{exampleblock}
+
+\begin{itemize}
+  \item hereditary substitution:\\
+    \begin{center}
+    Recursive $\beta$-reduction (substitutions) on structures
+    \end{center}
+  \item container normalization:
+    \[ \Sigma_{x:A} \Sigma_{y:B(x)} C(x,y) \cong \Sigma_{(x,y):\Sigma_{x:A} B(x)} C(x,y) \]
+    \[ \Pi_{x:A} \Pi_{y:B(x)} C(x,y) \cong \Pi_{(x,y):\Sigma_{x:A} B(x)} C(x,y) \]
+    \[ \Pi_{x:A} \Sigma_{y:B(x)} C(x,y) \cong \Sigma_{f:\Pi_{x:A} B(x)} \Pi_{x:A} C(x, f(x))\]
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Hereditary Containers}
+
+Normal forms, neutral terms and spines are mutually defined:
+
+\begin{exampleblock}{}
+\begin{verbatim}
+data Nf : Con → Kind → Set₁ where
+  ...
+
+record Ne (Γ : Con) (B : Kind) : Set₁ where
+  inductive
+  field
+    S : Set
+    P : Var Γ A → S → Set
+    R : (x : Var Γ A) (s : S) → P x s → Sp Γ A B
+
+data Sp : Con → Kind → Kind → Set₁ where
+  ...
+\end{verbatim}
+\end{exampleblock}
+\end{frame}
+
+\begin{frame}[fragile]{Hereditary Containers}
+
+\begin{block}{Definition}
+\textbf{Hereditary Containers} are closed normal forms
+\end{block}
+
+\begin{exampleblock}{}
+\begin{verbatim}
+HCont : Kind → Set₁
+HCont A = Nf ∙ A
+\end{verbatim}
+\end{exampleblock}
+
+\pause
+Function interpretation:
+
+\begin{exampleblock}{}
+\begin{verbatim}
+⟦_⟧ : HCont A → ⟦ A ⟧K
+⟦_⟧ = ...
+\end{verbatim}
+\end{exampleblock}
+
+\pause
+Full semantics?
+
+\begin{exampleblock}{}
+\begin{verbatim}
+⟦_⟧ : HCont A → HFunc A
+⟦_⟧ = {- TODO -}
+\end{verbatim}
+\end{exampleblock}
+\end{frame}
+
+\begin{frame}{Conclusion}
+
+\centering
+\begin{tabular}{|c|c|c|}
+  \hline
+  \texttt{Bool, ℕ} & $\mu$ of Func & W on Cont \\
+  \hline
+  \texttt{ℕ∞} & $\nu$ of Func & M on Cont \\
+  \hline
+  \texttt{Fin} & $\mu$ of IFunc & IW on ICont \\
+  \hline
+  \texttt{Fin∞} & $\nu$ of IFunc & IM on ICont \\
+  \hline
+  \texttt{List, Bush} & $\mu$ of 2Func(\checkmark) & 2W(\checkmark) on 2Cont(\checkmark) \\
+  \hline
+  \texttt{Stream} & $\nu$ of 2Func & 2M(?) on 2Cont \\
+  \hline
+  \texttt{MaybeT, StateT} & $\mu$ of HFunc(\checkmark) & HW(?) on HCont(\checkmark) \\
+  \hline
+  \texttt{Vec : Set → ℕ → Set} & $\mu$ of (?) & (?) on (?) \\
+  \hline
+  ... & ... & ... \\
+\end{tabular}
+
+\begin{itemize}
+  \item Fill in all (?) in the table.
+  \item Prove all types reduce to normal W-types.
+  \item Look at mutually inductive and coinductive types.
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{}
+\Huge
+\[\int_c Talk\]
+\end{frame}
+
+\begin{frame}{}
+
+Citation
+
+\end{frame}
+
+\end{document}

@@ -39,14 +39,24 @@
 \begin{document}
 \frame{\titlepage}
 
+\begin{frame}{Introduction}
+
+\begin{itemize}
+  \item Generalization of containers and W-types
+  \item MLTT + funExt
+  \item Agda formalization
+\end{itemize}
+
+\end{frame}
+
 \begin{frame}[fragile]{Old Story}
 
 \begin{block}{Theorem}
-Inductive types can be modeled as initial F-algebras.
+Inductive types can be modeled as initial F-algebras
 \end{block}
 
 \begin{exampleblock}{}
-  \begin{columns}[c,onlytextwidth]
+  \begin{columns}
     \begin{column}{0.5\textwidth}
     \begin{verbatim}  
     data ℕ : Set where
@@ -74,12 +84,12 @@ Inductive types can be modeled as initial F-algebras.
 \begin{frame}[fragile]{Old Story}
 
 \begin{block}{Definition}
-\textbf{Containers} correspond to polynomial functors:
-\[ X \mapsto \sum_{s \in S} X^{P(s)} \]
+\textbf{Containers} are polynomial functors:
+\[ X \mapsto \sum_{s : S} P(s) \to X \]
 \end{block}
 
 \begin{exampleblock}{}
-  \begin{columns}[T,onlytextwidth]
+  \begin{columns}
     \begin{column}{0.35\textwidth}
     \begin{verbatim}
     record Cont : Set₁ where
@@ -107,8 +117,8 @@ Inductive types can be modeled as initial F-algebras.
 \begin{frame}[fragile]{Old Story}
 
 \begin{block}{Definition}
-\textbf{W-types} correspond to all strictly positive inductive types.
-They are the initial algebras (least fixpoints) of containers.
+\textbf{W-types} are the initial algebras of containers.
+They correspond to all (strictly positive) inductive types.
 \end{block}
 
 \begin{exampleblock}{}
@@ -136,7 +146,7 @@ They are the initial algebras (least fixpoints) of containers.
 
 \begin{frame}[fragile]{More Types}
 
-What about types like \texttt{List}?
+What about \texttt{List}?
 
 \begin{exampleblock}{}
 \begin{verbatim}
@@ -158,7 +168,7 @@ ListASig A X = ⊤ ⊎ A × X
 
 \begin{frame}[fragile]{More Types}
 
-What about types like \texttt{Bush}? (legit Agda definition btw)
+What about \texttt{Bush}?
 
 \begin{exampleblock}{}
 \begin{verbatim}
@@ -183,7 +193,7 @@ Let's try to take \texttt{Bush} and \texttt{A} separately:
 \begin{exampleblock}{}
 \begin{verbatim}
 BushSig : (Set → Set) → Set → Set
-BushSig F X = ⊤ ⊎ F (F X) × X
+BushSig F X = ⊤ ⊎ X × F (F X)
 \end{verbatim}
 \end{exampleblock}
 \end{frame}
@@ -191,10 +201,11 @@ BushSig F X = ⊤ ⊎ F (F X) × X
 \begin{frame}[fragile]{2nd-Order Functors}
 
 \begin{block}{Definition}
-A \textbf{2nd-order functor} has all following constructions:
+\textbf{2nd-order functors} have all following constructions
 \end{block}
 
-\pause
+It is a function:
+
 \begin{exampleblock}{}
 \begin{verbatim}
 H : (Set → Set) → Set → Set
@@ -202,15 +213,14 @@ H F X = ⊤ ⊎ F (F X) × X
 \end{verbatim}
 \end{exampleblock}
 
-\pause
+It is a functor of \textbf{[Set,Set]}:
+
 \begin{exampleblock}{}
 \begin{verbatim}
 ℍ : Func → Func
-ℍ (F , F₁) = H F , HF₁ where
-  HF₁ : (X → Y) → H F X → H F Y
-  HF₁ = ...
+ℍ (F , F₁) = H F , ...
 
-ℍ₁ : {𝔽 𝔾 : Func} → Nat 𝔽 𝔾 → Nat (ℍ 𝔽) (ℍ 𝔾)
+ℍ₁ : {𝔽 𝔾 : Func} → NatTrans 𝔽 𝔾 → NatTrans (ℍ 𝔽) (ℍ 𝔾)
 ℍ₁ = ...
 \end{verbatim}
 \end{exampleblock}
@@ -219,9 +229,15 @@ H F X = ⊤ ⊎ F (F X) × X
 \begin{frame}[fragile]{2nd-Order Containers}
 
 \begin{block}{Definition}
-A \textbf{2nd-order container} is given by a shape, positions of both \texttt{X} and \texttt{F},
-and recurively, other 2nd-order container for each position of \texttt{F}.
+\textbf{2nd-order containers} are polynomial 2nd-order functors (with applications)
 \end{block}
+
+\begin{exampleblock}{}
+\begin{verbatim}
+H : (Set → Set) → Set → Set
+H F X = ⊤ ⊎ F (F X) × X
+\end{verbatim}
+\end{exampleblock}
 
 \begin{exampleblock}{}
 \begin{verbatim}
@@ -249,13 +265,22 @@ Function interpretation:
 \end{verbatim}
 \end{exampleblock}
 
-\pause
-Functor of $\textbf{\underline{[Set,Set]}}$ interpretation:
+Functor of \textbf{[Set,Set]} interpretation:
 
 \begin{exampleblock}{}
 \begin{verbatim}
 2⟦_⟧F : 2Cont → Func → Func
-2⟦_⟧F₁ : 2Cont → {𝔽 𝔾 : Func} → Nat 𝔽 𝔾 → Nat (ℍ 𝔽) (ℍ 𝔾)
+2⟦_⟧F₁ : (H : 2Cont) {𝔽 𝔾 : Func} → NatTrans 𝔽 𝔾 → NatTrans (H 𝔽) (H 𝔾)
+\end{verbatim}
+\end{exampleblock}
+
+\pause
+Functor of \textbf{Cont} interpretation:
+
+\begin{exampleblock}{}
+\begin{verbatim}
+app : 2Cont → Cont → Cont
+app₁ : (H : 2Cont) → SP →ᶜ TQ → app H SP →ᶜ app H TQ
 \end{verbatim}
 \end{exampleblock}
 \end{frame}
@@ -263,28 +288,28 @@ Functor of $\textbf{\underline{[Set,Set]}}$ interpretation:
 \begin{frame}[fragile]{Initial 2nd-Order Algbra}
 
 \begin{block}{Definition}
-\textbf{2nd-order W-types} correspond to all strictly positive inductive types with kinds \texttt{(Set → Set)}. They are the initial algebras (least fixpoint) of 2nd-order containers.
+\textbf{2nd-order W-types} are the initial algebras of 2nd-order containers. They correspond to all (strictly positive) inductive types with kinds \texttt{(Set → Set)}.
 \end{block}
 
 \begin{exampleblock}{}
   \begin{columns}
     \begin{column}{0.5\textwidth}
     \begin{verbatim}  
-    2W : 2Cont → Func
+    2W : 2Cont → Cont
 
     2sup : {H : 2Cont} 
-      → NatTrans (2⟦ H ⟧F (2W H)) (2W H)
+      → app H (2W H) →ᶜ 2W H
 
-    fold2W : {𝔽 : Func} {H : 2Cont} 
-      → NatTrans (2⟦ H ⟧ 𝔽) 𝔽
-      → NatTrans (2W H) 𝔽
+    fold2W : {H : 2Cont} {SP : Cont}
+      → app H SP →ᶜ SP
+      → 2W H →ᶜ SP
     \end{verbatim}
     \end{column}
 
-    \begin{column}{0.5\textwidth}
+    \begin{column}{0.55\textwidth}
       \begin{tikzcd}[column sep=huge]
-        \texttt{2⟦ H ⟧F (2W H)} \arrow[r , "\texttt{2⟦ H ⟧F₁ (fold2W α)}"] \arrow[d , "\texttt{2sup}"] & \texttt{2⟦ H ⟧F 𝔽} \arrow[d, "\texttt{α}"] \\
-        \texttt{2W H} \arrow[r , "\texttt{fold2W α}"] & \texttt{𝔽}
+        \texttt{app H (2W H)} \arrow[r , "\texttt{app₁ H (fold2W α)}"] \arrow[d , "\texttt{2sup}"] & \texttt{app H SP} \arrow[d, "\texttt{α}"] \\
+        \texttt{2W H} \arrow[r , "\texttt{fold2W α}"] & \texttt{SP}
       \end{tikzcd}
     \end{column}
   \end{columns}
@@ -299,11 +324,11 @@ What about types like monad transformers?
 \begin{verbatim}
 record MaybeT (M : Set → Set) (X : Set) : Set where
   field
-    runMaybeT : M (Maybe X)
+    runMaybeT : M (⊤ ⊎ X)
 \end{verbatim}
 \end{exampleblock}
 
-Its signature is in even higher kinds:
+Their signatures are in even higher kinds:
 
 \begin{exampleblock}{}
 \begin{verbatim}
@@ -331,9 +356,11 @@ data Kind : Set where
 
 \end{frame}
 
-\begin{frame}[fragile]{Hereditary Functors}
+\begin{frame}[fragile]{Higher-Order Functors}
 
-\textbf{Hereditary functors} and \textbf{hereditary categories} are mutually defined:
+\begin{block}{Definition}
+\textbf{Higher-order functors} are functions with \textbf{isHFunc}, and they are mutually defined with \textbf{higher-order categories}
+\end{block}
 
 \begin{exampleblock}{}
 \begin{verbatim}
@@ -350,14 +377,21 @@ HCat A = record { Obj = HFunc A ; Mor = NatTrans ; ... }
 
 \pause
 \begin{alertblock}{Note}
-Hereditary categories are not freely generated functor categories!
+Higher-order categories are not iterated functor categories!
 \end{alertblock}
 
 \end{frame}
 
-\begin{frame}[fragile]{Hereditary Containers}
+\begin{frame}[fragile]{Higher-Order Containers}
 
 Unnormalized syntax ($\lambda$-terms + polynomials)
+
+\begin{exampleblock}{}
+\begin{verbatim}
+H : (Set → Set) → Set → Set
+H = λ F → λ X → ⊤ ⊎ F (F X) × X
+\end{verbatim}
+\end{exampleblock}
 
 \begin{exampleblock}{}
 \begin{verbatim}
@@ -385,7 +419,7 @@ nf = ...
 \begin{itemize}
   \item hereditary substitution:\\
     \begin{center}
-    Recursive $\beta$-reduction (substitutions) on structures
+    Recursive substitutions on structures
     \end{center}
   \item container normalization:
     \[ \Sigma_{x:A} \Sigma_{y:B(x)} C(x,y) \cong \Sigma_{(x,y):\Sigma_{x:A} B(x)} C(x,y) \]
@@ -394,9 +428,9 @@ nf = ...
 \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{Hereditary Containers}
+\begin{frame}[fragile]{Higher-Order Containers}
 
-Normal forms, neutral terms and spines are mutually defined:
+Normal forms, neutral terms and spines are mutually defined
 
 \begin{exampleblock}{}
 \begin{verbatim}
@@ -416,10 +450,10 @@ data Sp : Con → Kind → Kind → Set₁ where
 \end{exampleblock}
 \end{frame}
 
-\begin{frame}[fragile]{Hereditary Containers}
+\begin{frame}[fragile]{Higher-Order Containers}
 
 \begin{block}{Definition}
-\textbf{Hereditary Containers} are closed normal forms
+\textbf{Higher-order containers} are closed normal forms
 \end{block}
 
 \begin{exampleblock}{}
@@ -428,8 +462,10 @@ HCont : Kind → Set₁
 HCont A = Nf ∙ A
 \end{verbatim}
 \end{exampleblock}
+\end{frame}
 
-\pause
+\begin{frame}[fragile]{Higher-Order Containers to Functors}
+
 Function interpretation:
 
 \begin{exampleblock}{}
@@ -440,12 +476,22 @@ Function interpretation:
 \end{exampleblock}
 
 \pause
-Full semantics?
+Full semantics:
 
 \begin{exampleblock}{}
 \begin{verbatim}
 ⟦_⟧ : HCont A → HFunc A
-⟦_⟧ = {- TODO -}
+⟦_⟧ = ?
+\end{verbatim}
+\end{exampleblock}
+
+\pause
+Initial algebras of endo-higher-order containers:
+
+\begin{exampleblock}{}
+\begin{verbatim}
+HW : HCont (A ⇒ A) → HCont A
+HW = ?
 \end{verbatim}
 \end{exampleblock}
 \end{frame}
@@ -453,29 +499,29 @@ Full semantics?
 \begin{frame}{Conclusion}
 
 \centering
-\begin{tabular}{|c|c|c|}
+\begin{tabular}{|c|c|}
   \hline
-  \texttt{Bool, ℕ} & $\mu$ of Func & W on Cont \\
+  \texttt{ℕ : Set} & W on Cont \\
   \hline
-  \texttt{ℕ∞} & $\nu$ of Func & M on Cont \\
+  \texttt{ℕ∞ : Set} & M on Cont \\
   \hline
-  \texttt{Fin} & $\mu$ of IFunc & IW on ICont \\
+  \texttt{Fin : ℕ → Set} & IW on ICont \\
   \hline
-  \texttt{Fin∞} & $\nu$ of IFunc & IM on ICont \\
+  \texttt{Fin∞ : ℕ → Set} & IM on ICont \\
   \hline
-  \texttt{List, Bush} & $\mu$ of 2Func(\checkmark) & 2W(\checkmark) on 2Cont(\checkmark) \\
+  \texttt{List, Bush : Set → Set} & 2W(\checkmark) on 2Cont(\checkmark) \\
   \hline
-  \texttt{Stream} & $\nu$ of 2Func & 2M(?) on 2Cont \\
+  \texttt{Stream : Set → Set} & 2M(?) on 2Cont \\
   \hline
-  \texttt{MaybeT, StateT} & $\mu$ of HFunc(\checkmark) & HW(?) on HCont(\checkmark) \\
+  \texttt{MaybeT : (Set → Set) → Set → Set} & HW(?) on HCont(\checkmark) \\
   \hline
-  \texttt{Vec : Set → ℕ → Set} & $\mu$ of (?) & (?) on (?) \\
+  \texttt{Vec : Set → ℕ → Set} & (?) on (?) \\
   \hline
-  ... & ... & ... \\
+  ... & ... \\
 \end{tabular}
 
 \begin{itemize}
-  \item Fill in all (?) in the table.
+  \item Fill in all ? in the table.
   \item Prove all types reduce to normal W-types.
   \item Look at mutually inductive and coinductive types.
 \end{itemize}
@@ -485,12 +531,6 @@ Full semantics?
 \begin{frame}{}
 \Huge
 \[\int_c Talk\]
-\end{frame}
-
-\begin{frame}{}
-
-Citation
-
 \end{frame}
 
 \end{document}

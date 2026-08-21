@@ -35,3 +35,49 @@ postulate
 
   Σ-η : (F : I → Ty Θ *) (t : Tm Θ (Δ ▷ Σ I F) τ)
       → case F (λ i → t [ inj F i zero ]₁) ≡ t
+
+{-
+define the calculus w.o. mu-nu incuding substitutions 
+(ok we can reduce substutions)
+show that HCont are basically the normal forms. 
+HCont -> HCont omega 
+Ty -> KI
+Tm -> TY
+[[_]] -> TM
+
+F : * -> *
+F X = 1 + X 
+
+FF : Set -> Set
+FF = [[ F ]]
+
+TM F is a representation of FF
+eg there is 
+X : * ; empty |- in1 () : F @ X
+X : * ; x : X |- in2 x : F @  X        
+
+add mu , [[-]] doesn't work 
+f-omega works , compute a head normal form 
+
+Nat = mu F : * 
+
+Semantics : basic calculus , Cont are the free coproducts 
+1st order containers : Given a category C, 
+what happens if you freely add coproducts : Cont C
+
+S : Set, P : S -> C  
+S <| P : C => Set
+S <| P c = Sigma s : S . C(P x , c)
+
+eg S = 2 , P 0, P 1
+(P0 + P1) c = C(P0 , c) x C(P 1, c) 
+
+products come for free 
+
+what happens for higher order, can we use this to find semantics of HCont?
+
+how can we understand mu , nu (maybe via colimits , limits) 
+free colimits = PSh (accessible)
+
+
+-}

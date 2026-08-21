@@ -1,3 +1,23 @@
+New Plan (close to my talk at Genua)
+
+1. Define second-order containers (use Bush as motivation)
+2. Construct the special cases and generalize to W2 (and M2 ?) extenral 
+3. Q : can we define higher versions of W , M ?
+4. Define HCont generalizing Cont2 to higher types
+    model of STLC ? 
+5. Show that we don't have an internal W (or M)
+6. Show that W3 external => W2 internal (using fp construction)
+7. Further work : incorporate higher W and M 
+    - coinductive syntax
+    - F-omega calculus
+    - derivatives of higher container
+
+
+
+
+
+
+---
 We have:
 
 1. Definition of HCont

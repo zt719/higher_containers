@@ -17,9 +17,11 @@ data Zero2 : Set where
 
 NatBody : Ty (• ▷ *) *
 NatBody = Σ Bool2 (λ{ true → Π Zero2 (λ ()) ; false → zero })
-
+-- NatBody - X : * |- 1 + X : *
+ 
 NatF : Ty • (* ⇒ *)
 NatF = lam {κ = *} NatBody
+-- NatF : \ X : * -> 1 + X
 
 NatTy : Ty • *
 NatTy = mu NatF
@@ -28,9 +30,12 @@ NatTy = mu NatF
 unfold : app NatF (mu NatF) ≡ NatBody [ mu NatF ]T
 unfold = Ty-β NatBody (mu NatF)
 
+-- • ; • |- zero : NatTy
 zeroTm : Tm • • NatTy
 zeroTm = con NatF ε (subst (Tm • •) (sym unfold) (inj _ true (pair _ (λ ()))))
 
+-- cannot say suc : Nat -> Nat because we don't have ->
+-- but given 
 sucTm : Tm • • NatTy → Tm • • NatTy
 sucTm n = con NatF ε (subst (Tm • •) (sym unfold) (inj _ false n))
 

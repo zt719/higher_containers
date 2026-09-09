@@ -1,0 +1,270 @@
+#+TITLE: Direct semantics of the HCont-F-omega SOGAT
+#+DATE: 2026-09-09
+
+Notes from a design discussion. Concerns the files
+=hcont-omega/hcont-sogat.agda= (SOGAT), =hcont-omega/hcont-sogat-mu.agda=
+(mu extension) and =hcont-omega/hcont-f-omega.agda= (the de Bruijn GAT
+with its "simple semantics" comment).
+
+Notation: [[_]] is interpretation; C => D is the category of functors
+C -> D (also read "a functor C -> D"); x product of categories; 1 the
+terminal category; [ C , D ] a functor category; ∫ an end; 𝓒_K the
+category of kind contexts.
+
+* The two presentations
+
+- SOGAT (=hcont-sogat.agda=): sorts =Kind : Set=, =Ty : Kind -> Set=,
+  =Tm : Ty * -> Set=. Operations =*=, =_⇒_=, and the HOAS iso
+  =⇒-iso : (Ty K -> Ty L) ≅ Ty (K ⇒ L)=, plus =Π=, =Σ= characterised by
+  isos =prod=, =inj=.
+- GAT (=hcont-f-omega.agda=): type variables made de Bruijn
+  (=zero/suc/lam/app=), an explicit kind context =Θ : ConK= and an
+  explicit term context =Γ : ConT Θ=. Terms =Tm Θ Γ σ=.
+
+They are the same theory. The GAT is what you get after (i) replacing
+=⇒-iso= by de Bruijn =lam/app= and (ii) adding the term context =Γ=.
+
+* "Interpret the SOGAT directly" = presheaf / CwF model
+
+A model of a SOGAT is a CwF over some base category together with
+local-representability structure for every sort that has a binder, and
+an interpretation of each operation. "Directly" means: interpret
+=Kind=, =Ty=, =Tm= as (dependent) presheaves over a category of
+contexts, rather than going through the de Bruijn GAT.
+
+** The category of contexts is just ConK
+
+Check which operations bind an object variable. Only
+=⇒-iso : (Ty K -> Ty L) ≅ Ty (K ⇒ L)= binds, and it binds a =Ty K=.
+Nothing binds a =Tm=: in =Π/Σ/prod/inj= the =I : Set= is a parameter
+and =i : I= a metavariable of parameter sort, not a bound term
+variable.
+
+So this SOGAT has exactly ONE variable sort, =Ty=, indexed by the
+PARAMETER =Kind=. Its category of contexts is
+
+:   𝓒_K = ConK          -- telescopes of type variables tagged by Kinds
+
+with no =Γ=. The =Γ : ConT Θ= belongs to the GAT.
+
+** The sort / presheaf / parameter distinction
+
+Three levels, not two:
+
+1. Occurs negatively (bound by some operation) => must be a LOCALLY
+   REPRESENTABLE presheaf => contributes a context former.
+2. Does not occur negatively => a presheaf over the context category
+   with NO representability. Non-trivial iff some context-forming sort
+   occurs free in its indices.
+3. No context-forming sort occurs in it => CONSTANT presheaf ≅ a plain
+   set. That is a PARAMETER (Fiore sense).
+
+"Parameter" is strictly stronger than "non-negative": non-negative buys
+"not representable", not "constant".
+
+| sort            | negative?        | ctx-forming sort free in it?              | interpretation                                                        |
+|-----------------+------------------+------------------------------------------+---------------------------------------------------------------------|
+| =Kind=          | no               | no (a kind has no free variables at all) | constant presheaf ≅ set; [[Kind]] ∈ Cat. PARAMETER.                |
+| =Ty=            | yes (=⇒-iso=)    | yes (type variables, via Θ)              | locally representable presheaf over 𝓒_K; contributes Θ ▷ κ.        |
+| =Tm= (base)     | no               | yes (type variables, via Θ and σ)        | presheaf over 𝓒_K, NOT representable.                              |
+| =Tm= (with fold)| yes (fold's alg) | yes                                     | locally representable over the full context category; contributes Γ ▷ A. |
+
+Each sort's level is read off the signature, not declared. The only
+genuine design choices are which binders the theory contains: kind
+polymorphism would push =Kind= from parameter to representable sort;
+=fold= pushes =Tm= from non-representable presheaf to representable
+sort.
+
+Caveat on =Tm= (base): it is NOT "just a set". The value is
+[[Tm]] Θ σ = ∫_(X : [[Θ]]) [[σ]] X, but as Θ ranges this is a genuine
+functor: a kind substitution δ : Θ' -> Θ gives [[σ[δ]]] = [[σ]] ∘ [[δ]]
+and a restriction ∫_[[Θ]] [[σ]] -> ∫_[[Θ']] [[σ]]∘[[δ]]. "No further
+context" means no TERM context; it still depends on the KIND context.
+
+* The intended (Cat) model
+
+: [[Kind]] : Set₁        [[Kind]]     = Cat            -- universe of small categories
+: [[*]]                  [[*]]        = Set
+: [[_⇒_]]                [[K ⇒ L]]    = [ [[K]] , [[L]] ]   -- functor category
+
+: [[Kind]]  : object of the base                        = Cat
+: [[Ty]]    : presheaf on ∫[[Kind]] over 𝓒_K (DepPsh Kind)
+:             [[Ty]] Θ κ = [ [[Θ]] , [[κ]] ]
+:             with [[•]] = 1,  [[Θ ▷ κ]] = [[Θ]] x [[κ]]
+: [[Tm]]    : dependent presheaf on ∫([[Ty]] at *), no term context
+:             [[Tm]] Θ σ = ∫_(X : [[Θ]]) [[σ]] X = lim [[σ]]
+
+Because every [[κ]] has an initial object, so does [[Θ]], and
+lim [[σ]] = [[σ]] evaluated at the empty (initial) type environment.
+
+** ⇒-iso = local representability of Ty
+
+[[Ty]] is locally representable in the 𝓒_K direction:
+
+:   𝓒_K(Δ , Θ ▷ κ) ≅ Σ (f : 𝓒_K(Δ , Θ)) . [[Ty]] Δ κ
+
+and then =⇒-iso= is the Π / exponential structure of that CwF:
+
+:   [[Ty]] Θ (κ ⇒ κ')            ≅ [[Ty]] (Θ ▷ κ) κ'
+:   [ [[Θ]] , [ [[κ]] , [[κ']] ] ] ≅ [ [[Θ]] x [[κ]] , [[κ']] ]    -- currying
+
+=LAM= / =APP= are the two transports. The binder needs no term context.
+
+** prod / inj
+
+: prod : Π_i lim [[F i]] ≅ lim (Π_i [[F i]])   -- limits commute with products, always
+: inj  : Σ_i lim [[F i]] ≅ lim (Σ_i [[F i]])   -- only because [[Θ]] has an initial object
+
+The =inj= fragility is the point. In the GAT you do NOT state Σ as a
+closed-term iso; you have =inj=/=case= + =Σ-β=/=Σ-η= fibred over an
+arbitrary context Δ and target τ, and that fibred form
+
+:   Nat([[Δ]] x [[Σ I F]] , [[τ]]) ≅ Π_i Nat([[Δ]] x [[F i]] , [[τ]])
+
+holds structurally (product distributes over coproduct pointwise), with
+no initial-object assumption. Same medicine as for Γ: fibre the law
+over contexts, do not state it on closed terms.
+
+** Relation to hcont-f-omega.agda
+
+Same theory. Its [[Γ]] : [[Θ]] => Set, [[a]] ∈ ∫_X [[Γ]] X -> [[σ]] X
+restricts at Γ = • to the SOGAT's [[Tm]] Θ σ = ∫_X [[σ]] X. The
+Γ-dependency is the first-order presentation, not something the SOGAT
+forces.
+
+* Adding mu: do we introduce term contexts?
+
+mu and =con= do NOT force term contexts; =fold= does.
+
+- =μ : Ty ((K ⇒ K) ⇒ K)= is a =Ty= constant. Adds nothing.
+- =con : Tm (F @ Fix F) -> Tm (Fix F)= is a unary operation. =Tm= in a
+  negative position, but as a plain function symbol -- like =PROJ=. No
+  variable bound, no context.
+- =fold='s algebra argument
+  =(args) -> Tm (apArgs S (APP F C) args) -> Tm (apArgs S C args)= is a
+  function whose DOMAIN mentions =Tm=. In HOAS: "for a fresh
+  x : Tm (F @ C), a term ... : Tm C" -- the first operation that BINDS
+  a term variable. Binding a term variable requires =Tm= to be locally
+  representable, i.e. term-context extension Γ ▷ A to exist.
+
+Options:
+
+1. Keep the HOAS form (as in =hcont-sogat-mu.agda= now): no explicit Γ
+   in the signature, but you have implicitly committed to =Tm= being
+   locally representable. And it only works as POSTULATES: an arbitrary
+   metatheoretic Tm -> Tm is not a term, so no induction and no
+   strict-positivity check.
+2. Add an explicit term context Γ : ConT Θ, as the GAT
+   =h-cont-f-omega-munu.agda= does with Δ. The algebra becomes a real
+   term Tm Θ (Γ ▷ F @ C) C; positivity is checkable; =fold= is a real
+   constructor. This is the honest syntax if the SOGAT is the
+   DEFINITION (initial model / normal forms).
+3. Leave =fold= external -- a metatheoretic specification of the
+   universal property, not part of the syntax. No Γ needed, but a spec,
+   not an inductive type.
+
+Semantic caveat: in the intended Cat model with
+[[Tm]] Θ σ = [[σ]] at the initial object of [[Θ]], =fold= goes through
+WITHOUT a term context -- mu and application commute with
+evaluation-at-initial-object, so the algebra is only ever needed at the
+empty type environment, which a metatheoretic Tm(F@C) -> Tm C supplies.
+Same lucky mechanism as =inj=. It breaks under gluing over a non-trivial
+base (there [[Tm]] is Psh(Cont)-valued and a natural Tm(F@C) -> Tm C is
+genuinely an open term), and it is not a syntax. So: spec => option
+1/3; definition => option 2.
+
+* Adding mu: the model must change
+
+[[μ]] X φ = initial algebra of φ : [[K]] => [[K]]. With
+[[K ⇒ L]] = [ [[K]] , [[L]] ] = ALL functors there is no reason that
+initial algebra exists.
+
+Observation: it is only a condition at =*=. The spine machinery
+(=Args=, =apArgs=, =con=/=fold= uniform in S) reduces mu at kind ⇒* S
+to pointwise W at =*=, computed in [[*]] = Set.
+
+** Fix (a): shrink the semantic function spaces
+
+Interpret [[K ⇒ L]] as a class closed under initial algebras. For this
+project: strictly positive / (higher) CONTAINER functors.
+
+:   [[*]]      = Set
+:   [[K ⇒ L]]  = Cont([[K]] , [[L]])          -- containers, not arbitrary functors
+
+Every container endofunctor on Set has an initial algebra (W) and a
+terminal coalgebra (M), so mu (and nu) become total. Containers are
+closed under Σ I, Π I (I : Set), composition, mu, nu, and the
+2-category is cartesian closed --
+Cont(A x B, C) ≃ Cont(A, Cont(B, C)) -- so =⇒-iso=/=lam=/=app= still
+hold (this is exactly what the =hcont-f-omega= semantics already
+establishes; mu/nu add "chosen (co)algebras", which containers supply).
+
+Generic version: [[*]] a locally presentable category,
+[[K ⇒ L]] = Acc([[K]] , [[L]]) (accessible functors); Adamek's
+transfinite construction gives initial algebras for every accessible
+endofunctor. Containers are the canonical-form version.
+
+Consequences: [[Kind]] is no longer Cat but the sub-2-category
+generated by Set under the chosen [[_⇒_]]; [[Ty]] Θ κ = Cont([[Θ]], [[κ]]);
+the "[[Tm]] = evaluate at the initial object of [[Θ]]" reading survives
+(container-functor categories still have an initial object: empty
+container ↦ constant ∅).
+
+** Fix (b): keep the function spaces large, restrict where mu is applied
+
+Leave [[K ⇒ L]] = [ [[K]] , [[L]] ], but note [[μ]] only ever meets
+functors in the IMAGE of [[Ty]], and every DEFINABLE endofunctor is
+strictly positive: by induction on =Ty=, =⇒-iso=, =Π I=, =Σ I= all
+preserve strict positivity (no negative type former in the calculus).
+So the definable endofunctors have initial algebras, and mu is a total
+operation on =Ty= even though [[μ]] is not defined on all of
+[ [[K]] , [[K]] ]. Cost: a "definable => strictly positive => has
+initial algebra" lemma. Benefit: no need to redo cartesian closure for
+Cont.
+
+** nu, and mu ≅ nu
+
+Containers give M alongside W, so fix (a) covers nu directly. For the
+initial algebra and terminal coalgebra to COINCIDE you need an
+algebraically compact (bilimit-compact) setting -- [[*]] a Cpo-like
+category rather than Set -- a bigger change to the base.
+
+Recommendation: fix (a) with containers, since it is the intended
+subject matter and keeps mu/nu total by construction.
+
+* The flat model over (Θ , Γ) pairs
+
+For gluing / canonicity / normalisation you want presheaves over a
+genuinely syntactic 𝓒. Then: objects (Θ , Γ), morphisms (δ , γ) = a
+type-variable substitution plus a term substitution, and the semantic
+category is the Grothendieck construction
+
+:   𝓢 = ∫^(𝓚 : Cat) [ 𝓚 , Set ]
+
+objects (𝓚 , G : 𝓚 => Set), morphisms (𝓚₁,G₁) -> (𝓚₀,G₀) =
+(H : 𝓚₁ => 𝓚₀ , α : G₁ => G₀ ∘ H) -- a functor and a natural
+transformation. [[_]] : 𝓒 -> 𝓢 is the model, a map of fibrations over
+𝓒_K -> Cat.
+
+The redundant dependencies reappear as: [[Kind]] and [[Ty]] must be
+PULLED BACK along 𝓒 -> 𝓒_K -> 1. That is not a hack -- it is exactly
+"Kind is a parameter" and "Ty is term-context-independent", and it is
+automatic if the model is built as a TOWER OF CwFs (base ↦ Cat;
+kind-context layer carrying [[Ty]]; term-context layer carrying [[Tm]])
+rather than one flat Psh(𝓒). The choice of base (1 vs Cat vs syntactic)
+is orthogonal: it only picks which presheaf topos you land in.
+
+* Pointers
+
+- Uemura, /A general framework for the semantics of type theory/ (MSCS
+  2023) -- representable map categories; SOGAT = GAT + representability.
+- Bocquet, Kaposi, Sattler, /For the metatheory of type theory,
+  internal sconing is enough/ (FSCD 2023) -- tower of CwFs, parameters
+  vs sorts.
+- Fiore, Hur, /Second-order equational logic/; Fiore, Mahmoud,
+  /Second-order algebraic theories/ -- parameters vs variable sorts,
+  Psh(𝔽) models.
+- Harper, /equational LF/ -- sorts as locally representable presheaves.
+- Adamek, /Free algebras and automata realizations/ -- initial algebra
+  as colimit of the omega-chain; Adamek, Koubek for the transfinite
+  version.

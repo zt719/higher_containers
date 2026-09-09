@@ -42,3 +42,42 @@ data Tm : (Θ : ConK) → ConT Θ → Ty Θ * → Set₁ where
   case : (F : I → Ty Θ *) → ((i : I) → Tm Θ (Δ ▷ F i) τ) → Tm Θ (Δ ▷ Σ I F) τ 
   prj : (F : I → Ty Θ *) → Tm Θ Δ (Π I F) → (i : I) → Tm Θ Δ (F i)
   pair : (F : I → Ty Θ *) → ((i : I) → Tm Θ Δ (F i)) → Tm Θ Δ (Π I F)
+
+{-
+Simple semantics (GAT / SOGAT style)
+
+Notation: ⟦_⟧ is the interpretation.  C ⇒ D is the category of functors
+from C to D (also read as "a functor C → D").  |C| is the objects of C,
+× the product of categories, 𝟙 the terminal category, ∫ an end.
+
+Kinds are interpreted as categories.
+
+  κ : Kind
+  ⟦ κ ⟧ : Cat
+  ⟦ * ⟧      = Set
+  ⟦ κ ⇒ κ' ⟧ = ⟦ κ ⟧ ⇒ ⟦ κ' ⟧          -- functor category
+
+Kind contexts are interpreted as (product) categories.
+
+  Θ : ConK
+  ⟦ Θ ⟧ : Cat
+  ⟦ • ⟧     = 𝟙
+  ⟦ Θ ▷ κ ⟧ = ⟦ Θ ⟧ × ⟦ κ ⟧
+
+A type is interpreted as a functor from its kind context to its kind.
+In the closed case Θ = • this is just an object ⟦ A ⟧ : |⟦ κ ⟧|.
+
+  A : Ty Θ κ
+  ⟦ A ⟧ : ⟦ Θ ⟧ ⇒ ⟦ κ ⟧
+
+A type context is interpreted as a functor into Set.
+
+  Γ : ConT Θ
+  ⟦ Γ ⟧ : ⟦ Θ ⟧ ⇒ Set
+
+A term is interpreted as an element of the end below, i.e. as a natural
+transformation ⟦ Γ ⟧ ⇒ ⟦ A ⟧ between functors ⟦ Θ ⟧ ⇒ Set.
+
+  a : Tm Θ Γ A          (Γ : ConT Θ, A : Ty Θ *)
+  ⟦ a ⟧ : ∫_(X : ⟦ Θ ⟧) (⟦ Γ ⟧ X → ⟦ A ⟧ X)
+-}

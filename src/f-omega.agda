@@ -43,9 +43,4 @@ data Tm : (Θ : ConK) → ConT Θ → Ty Θ * → Set where
 -- ID : all (X : *) X : *
 -- id : ID
 -- Nat = all (X : *) X → (X → X) → X 
--- Bush = Lam (A : *) all (F : * ⇒ *) (all X : *) X → (X → F (F X) → F A) : * ⇒ * 
-
-
-    
-
-   
+-- Bush = Lam (A : *) all (F : * ⇒ *) (all X : *) X → (X → F (F X) → F A) : * ⇒ *

@@ -511,4 +511,3 @@ emb {Γ} {A} (ne (S ◃ P ◃ R))
 
 embSp ε u = u
 embSp (t , ts) u = embSp ts (app u (emb t))
- 

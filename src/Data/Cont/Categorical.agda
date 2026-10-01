@@ -8,7 +8,7 @@ open import Data.Product
 open import Data.Sum using (_⊎_; inj₁; inj₂) renaming ([_,_] to case)
 open import Data.Nat using (ℕ; zero; suc)
 open import Data.Fin using (Fin; zero; suc)
-open import Function.Base using (id; _∘_)
+open import Function using (id; _∘_)
 open import Data.Cont.Base
 open import Data.Cont.Morphism
 

@@ -4,7 +4,6 @@ open import Data.Product using (_,_)
 open import Function.Base using (id; _∘_)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
 open import Data.Cont.Base using (Cont; _◃_; ⟦_⟧; ⟦_⟧₁)
-open import Prelude
 
 private
   variable
@@ -24,11 +23,14 @@ record _→ᶜ_ (SP TQ : Cont) : Set where
     fP : (s : S) → Q (fS s) → P s
 
 idᶜ : SP →ᶜ SP
-idᶜ = id ◃ id*
+idᶜ = id ◃ λ s → id
 
 infixr 9 _∘ᶜ_
 _∘ᶜ_ : TQ →ᶜ UV → SP →ᶜ TQ → SP →ᶜ UV
-(fT ◃  fQ) ∘ᶜ (fS ◃ fP) = (fT ∘ fS) ◃ (fP ∘* (fQ ∘ fS))
+(fT ◃  fQ) ∘ᶜ (fS ◃ fP) = (fT ∘ fS) ◃ (λ s → fP s ∘ fQ (fS s))
+
+------------------------------------------------------------------------
+-- Interpretation
 
 ⟦_⟧→ᶜ : SP →ᶜ TQ → (X : Set) → ⟦ SP ⟧ X → ⟦ TQ ⟧ X
 ⟦ fS ◃ fP ⟧→ᶜ X (s , f) = fS s , f ∘ fP s

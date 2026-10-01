@@ -1,8 +1,8 @@
 module Data.Cont.Base where
 
 open import Data.Product using (Σ; Σ-syntax; _,_)
-open import Function.Base using (id; _∘_)
-open import Relation.Binary.PropositionalEquality
+open import Function using (id; _∘_)
+open import Relation.Binary.PropositionalEquality using (_≡_; refl)
 
 ------------------------------------------------------------------------
 -- Definition

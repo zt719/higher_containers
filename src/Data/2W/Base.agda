@@ -1,9 +1,9 @@
 module Data.2W.Base where
 
-open import Data.Product using (Σ-syntax; _×_; _,_)
-open import Data.Sum using (_⊎_; inj₁; inj₂)
-open import Data.Cont using (Cont; _→ᶜ_; _◃_)
-open import Data.2Cont using (2Cont; _◃_+_+_; appS; appP; app)
+open import Data.Product
+open import Data.Sum
+open import Data.Cont
+open import Data.2Cont
 
 ------------------------------------------------------------------------
 -- Definition
@@ -80,13 +80,14 @@ module _
 
   elimP : {H' : 2Cont} (ws : 2WS-d H' H) (wp : 2WP-d H' H ws) → WPᴾ ws wp
 
-  elimS (mk s f) = mkᴾ s f λ pF → let (t , g) = f pF in
-    elimS t , λ q → elimP t q , elimS (g q) , elimP (g q)
+  elimS (mk s f) = mkᴾ s f (λ pF → let (t , g) = f pF in
+    elimS t , λ q → elimP t q , elimS (g q) , elimP (g q))
 
   elimP w (posX pX) =
     posXᴾ w pX
-  elimP (mk s f) (posF (pF , q , rp)) = let (t , g) = f pF in
-    posFᴾ (mk s f) pF q rp (elimS t) (elimP t q) (elimS (g q)) (elimP (g q) rp)
+  elimP (mk s f) (posF (pF , q , rp)) =
+    let (t , g) = f pF in
+      posFᴾ (mk s f) pF q rp (elimS t) (elimP t q) (elimS (g q)) (elimP (g q) rp)
 
 ------------------------------------------------------------------------
 -- Supremum
@@ -101,9 +102,11 @@ module _ {H : 2Cont} where
   2supS = 2supS-d
 
   2supP-d : {H' : 2Cont} (s : appS H' (2W H)) → 2WP-d H' H (2supS-d s) → appP H' (2W H) s
-  2supP-d {S ◃ PX + PF + RF} (s , f) (posX pX) = inj₁ pX
+  2supP-d {S ◃ PX + PF + RF} (s , f) (posX pX) =
+    inj₁ pX
   2supP-d {S ◃ PX + PF + RF} (s , f) (posF (pF , q , rp)) =
-    inj₂ (pF , q , let (t , g) = f pF in 2supP-d (g q) rp)
+    let (t , g) = f pF in
+      inj₂ (pF , q , 2supP-d (g q) rp)
 
   2supP : (s : appS H (2W H)) → 2WP H (2supS s) → appP H (2W H) s
   2supP = 2supP-d
@@ -113,6 +116,20 @@ module _ {H : 2Cont} where
 
   2sup : app H (2W H) →ᶜ 2W H
   2sup = 2sup-d
+
+  2supS⁻-d : {H' : 2Cont} → 2WS-d H' H → appS H' (2W H)
+  2supS⁻-d {S ◃ PX + PF + RF} (mk s f) = s , λ pF → let (t , g) = f pF in t , λ q → 2supS⁻-d (g q)
+
+  2supP⁻-d : {H' : 2Cont} (s : 2WS-d H' H) → appP H' (2W H) (2supS⁻-d s) → 2WP-d H' H s
+  2supP⁻-d {S ◃ PX + PF + RF} (mk s f) (inj₁ pX) = posX pX
+  2supP⁻-d {S ◃ PX + PF + RF} (mk s f) (inj₂ (pF , q , rp)) =
+    posF (pF , q , let (t , g) = f pF in 2supP⁻-d {RF s pF} (g q) rp)
+
+  2sup⁻-d : {H' : 2Cont} → 2W-d H' H →ᶜ app H' (2W H)
+  2sup⁻-d = 2supS⁻-d ◃ 2supP⁻-d
+
+  2sup⁻ : 2W H →ᶜ app H (2W H)
+  2sup⁻ = 2sup⁻-d
 
 ------------------------------------------------------------------------
 -- Folding
@@ -135,10 +152,11 @@ module _ {H : 2Cont} {TQ : Cont} (α : app H TQ →ᶜ TQ) where
     s , λ pF → let (t , g) = f pF in 
       fold2WS t , λ q → auxS (g (fold2WP t q))
 
-  auxP {S ◃ PX + PF + RF} (mk s f) (inj₁ pX) = posX pX
+  auxP {S ◃ PX + PF + RF} (mk s f) (inj₁ pX) =
+    posX pX
   auxP {S ◃ PX + PF + RF} (mk s f) (inj₂ (pF , q , rp)) =
-      posF (pF , let (t , g) = f pF in
-        fold2WP t q , auxP (g (fold2WP t q)) rp)
+    posF (pF , let (t , g) = f pF in
+      fold2WP t q , auxP (g (fold2WP t q)) rp)
 
   fold2WS s = αS (auxS s)
   
@@ -149,3 +167,40 @@ module _ {H : 2Cont} {TQ : Cont} (α : app H TQ →ᶜ TQ) where
 
   fold2W : 2W H →ᶜ TQ
   fold2W = fold2WS ◃ fold2WP
+
+{-
+module Other {H : 2Cont} {TQ : Cont} (α : app H TQ →ᶜ TQ) where
+
+  open Cont TQ renaming (S to T ; P to Q)
+  open _→ᶜ_ α renaming (fS to αS ; fP to αP)
+
+  auxS : {H' : 2Cont} → 2WS-d H' H → appS H' TQ
+  
+  auxP : {H' : 2Cont} (s : 2WS-d H' H)
+    → appP H' TQ (auxS s) → 2WP-d H' H s
+
+  auxS {S ◃ PX + PF + RF} (mk s f) =
+    s , λ pF → let (t , g) = f pF in 
+      αS (auxS t) , λ q → auxS (g (auxP t (αP (auxS t) q)))
+
+  auxP {S ◃ PX + PF + RF} (mk s f) (inj₁ pX) =
+    posX pX
+  auxP {S ◃ PX + PF + RF} (mk s f) (inj₂ (pF , q , rp)) =
+    posF (pF , let (t , g) = f pF in
+      auxP t (αP (auxS t) q) , auxP (g (auxP t (αP (auxS t) q))) rp)
+
+
+  fold2WS : 2WS H → T
+  
+  fold2WP : (s : 2WS H) → Q (fold2WS s) → 2WP H s
+
+  fold2WS s = αS (auxS s)
+  
+  fold2WP s q = auxP s (αP (auxS s) q)
+
+  aux : {H' : 2Cont} → 2W-d H' H →ᶜ app H' TQ
+  aux = auxS ◃ auxP
+
+  fold2W : 2W H →ᶜ TQ
+  fold2W = α ∘ᶜ aux
+-}

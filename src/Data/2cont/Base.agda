@@ -1,8 +1,8 @@
 module Data.2Cont.Base where
 
-open import Data.Product using (Σ-syntax; _,_)
-open import Data.Sum using (_⊎_; inj₁; inj₂)
-open import Data.Cont using (Cont; _◃_; _→ᶜ_)
+open import Data.Product
+open import Data.Sum
+open import Data.Cont
 
 ------------------------------------------------------------------------
 -- Definition
@@ -16,6 +16,10 @@ record 2Cont : Set₁ where
     PX : S → Set
     PF : S → Set
     RF : (s : S) → PF s → 2Cont
+
+⟦_⟧₂ : 2Cont → (Set → Set) → Set → Set
+⟦ S ◃ PX + PF + RF ⟧₂ F X =
+  Σ[ s ∈ S ] ((PX s → X) × ((pF : PF s) → F (⟦ RF s pF ⟧₂ F X)))
 
 -- Interpretation / Application
 

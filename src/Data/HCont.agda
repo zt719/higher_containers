@@ -487,8 +487,8 @@ data Ty : Con → Kind → Set₁ where
   var : Var Γ A → Ty Γ A
   lam : Ty (Γ ▹ A) B → Ty Γ (A ⇒ B)
   app : Ty Γ (A ⇒ B) → Ty Γ A → Ty Γ B
-  Πtm : (I : Set) → (I → Ty Γ A) → Ty Γ A
-  Σtm : (I : Set) → (I → Ty Γ A) → Ty Γ A
+  Πᶜ : (I : Set) → (I → Ty Γ A) → Ty Γ A
+  Σᶜ : (I : Set) → (I → Ty Γ A) → Ty Γ A
 
 {- Normalization -}
 
@@ -496,8 +496,8 @@ nf : Ty Γ A → Nf Γ A
 nf (var x) = nvar x
 nf (lam t) = lam (nf t)
 nf (app t u) = napp (nf t) (nf u)
-nf (Πtm I f) = Πnf I (nf ∘ f)
-nf (Σtm I f) = Σnf I (nf ∘ f)
+nf (Πᶜ I f) = Πnf I (nf ∘ f)
+nf (Σᶜ I f) = Σnf I (nf ∘ f)
 
 {- Embedding -}
 
@@ -507,7 +507,7 @@ embSp : Sp Γ A B → Ty Γ A → Ty Γ B
 
 emb (lam t) = lam (emb t)
 emb {Γ} {A} (ne (S ◃ P ◃ R))
-  = Σtm S (λ s → Πtm (Var Γ A) (λ x → Πtm (P x s) (λ p → embSp (R x s p) (var x))))
+  = Σᶜ S (λ s → Πᶜ (Var Γ A) (λ x → Πᶜ (P x s) (λ p → embSp (R x s p) (var x))))
 
 embSp ε u = u
 embSp (t , ts) u = embSp ts (app u (emb t))

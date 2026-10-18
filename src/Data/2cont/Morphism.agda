@@ -1,3 +1,5 @@
+{-# OPTIONS --without-K #-}
+
 module Data.2Cont.Morphism where
 
 open import Data.2Cont.Base
@@ -21,15 +23,21 @@ record _→²ᶜ_ (H J : 2Cont) : Set₁ where
     fPF : (s : S) → QF (fS s) → PF s
     fRF : (s : S) (qF : QF (fS s)) → RF s (fPF s qF) →²ᶜ LF (fS s) qF
 
-app→²ᶜ : {H J : 2Cont} → H →²ᶜ J → {F : Cont} → app H F →ᶜ app J F
-app→²ᶜ α = onS α ◃ onP α
-  where
-  onS : {H J : 2Cont} → H →²ᶜ J → {F : Cont} → appS H F → appS J F
-  onS {S ◃ PX + PF + RF} {T ◃ QX + QF + LF} (αS ◃ αPX + αPF + αRF) (s , f)
-    = αS s , λ qF → let (t , g) = f (αPF s qF) in t , λ q → onS (αRF s qF) (g q)
+-- Interpretation / Application
 
-  onP : {H J : 2Cont} (α : H →²ᶜ J) {F : Cont} (s : appS H F) → appP J F (onS α s) → appP H F s
-  onP {S ◃ PX + PF + RF} {T ◃ QX + QF + LF} (αS ◃ αPX + αPF + αRF) (s , f) (inj₁ pX) =
-    inj₁ (αPX s pX)
-  onP {S ◃ PX + PF + RF} {T ◃ QX + QF + LF} (αS ◃ αPX + αPF + αRF) (s , f) (inj₂ (pF , q , rp)) =
-    inj₂ (αPF s pF , let (t , g) = f (αPF s pF) in q , onP (αRF s pF) (g q) rp)
+app→²ᶜS : {H J : 2Cont} → H →²ᶜ J
+      → (F : Cont) → appS H F → appS J F
+app→²ᶜS {S ◃ PX + PF + RF} {T ◃ QX + QF + LF} (αS ◃ αPX + αPF + αRF) F (s , f)
+  = αS s , λ qF → let (t , g) = f (αPF s qF) in t , λ q → app→²ᶜS (αRF s qF) F (g q)
+
+app→²ᶜP : {H J : 2Cont} (α : H →²ᶜ J) (F : Cont) (s : appS H F) → appP J F (app→²ᶜS α F s) → appP H F s
+app→²ᶜP {S ◃ PX + PF + RF} {T ◃ QX + QF + LF} (αS ◃ αPX + αPF + αRF) F (s , f) (inj₁ pX) =
+  inj₁ (αPX s pX)
+app→²ᶜP {S ◃ PX + PF + RF} {T ◃ QX + QF + LF} (αS ◃ αPX + αPF + αRF) F (s , f) (inj₂ (pF , q , rp)) =
+  let (t , g) = f (αPF s pF) in
+    inj₂ (αPF s pF , q , app→²ᶜP (αRF s pF) F (g q) rp)
+
+app→²ᶜ : {H J : 2Cont}
+         → H →²ᶜ J
+         → (F : Cont) → app H F →ᶜ app J F
+app→²ᶜ α F = app→²ᶜS α F ◃ app→²ᶜP α F

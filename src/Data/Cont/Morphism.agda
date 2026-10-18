@@ -1,13 +1,14 @@
+{-# OPTIONS --without-K #-}
+
 module Data.Cont.Morphism where
 
-open import Data.Product using (_,_)
-open import Function.Base using (id; _∘_)
-open import Relation.Binary.PropositionalEquality using (_≡_; refl)
-open import Data.Cont.Base using (Cont; _◃_; ⟦_⟧; ⟦_⟧₁)
+open import Data.Product
+open import Data.Cont.Base
+open import Function
 
 private
   variable
-    SP SP' TQ TQ' UV : Cont
+    SP TQ UV : Cont
 
 ------------------------------------------------------------------------
 -- Morphism
@@ -34,7 +35,3 @@ _∘ᶜ_ : TQ →ᶜ UV → SP →ᶜ TQ → SP →ᶜ UV
 
 ⟦_⟧→ᶜ : SP →ᶜ TQ → (X : Set) → ⟦ SP ⟧ X → ⟦ TQ ⟧ X
 ⟦ fS ◃ fP ⟧→ᶜ X (s , f) = fS s , f ∘ fP s
-
-⟦_⟧→ᶜ-nat : (α : SP →ᶜ TQ) {X Y : Set} (g : X → Y)
-            → ⟦ α ⟧→ᶜ Y ∘ ⟦ SP ⟧₁ g ≡ ⟦ TQ ⟧₁ g ∘ ⟦ α ⟧→ᶜ X
-⟦ fS ◃ fP ⟧→ᶜ-nat g = refl

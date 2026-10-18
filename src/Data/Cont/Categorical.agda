@@ -1,16 +1,16 @@
+{-# OPTIONS --without-K #-}
+
 module Data.Cont.Categorical where
 
-open import Data.Unit using (⊤; tt) 
-open import Data.Empty using (⊥; ⊥-elim) 
-open import Data.Product
-  using (Σ; Σ-syntax; _,_; proj₁; proj₂; _×_; curry; uncurry)
-  renaming (<_,_> to pair)
-open import Data.Sum using (_⊎_; inj₁; inj₂) renaming ([_,_] to case)
-open import Data.Nat using (ℕ; zero; suc)
-open import Data.Fin using (Fin; zero; suc)
-open import Function using (id; _∘_)
+open import Data.Unit
+open import Data.Empty
+open import Data.Product renaming (<_,_> to pair)
+open import Data.Sum renaming ([_,_] to case)
+open import Data.Nat
+open import Data.Fin
 open import Data.Cont.Base
 open import Data.Cont.Morphism
+open import Function
 
 private
   variable

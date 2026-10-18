@@ -1,3 +1,5 @@
+{-# OPTIONS --without-K #-}
+
 module Data.Cont where
 
 open import Data.Cont.Base public

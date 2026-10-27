@@ -1,0 +1,89 @@
+\section{Second-Order}
+
+In this section, we start with a concrete problem, then introduce second-order containers with interpretation, then the category of second-order containers, then second-order W-type to fix the problem.
+
+\paragraph*{Bush Problem}
+
+From indexed type to higher-order type:
+
+How to understand the \AgdaDatatype{Bush} as example:
+
+\input{code/Bush}
+
+If we naively encode this using indexed type:
+
+\input{code/IndexedBush}
+
+The constructors \AgdaDatatype{nil} and \AgdaDatatype{cons} force it to be large type because they contains small universe \AgdaPrimitive{Type}. There are two issues here: there is a size issue in \AgdaDatatype{Bush (Bush X)}; there is a no positivity issue in \AgdaDatatype{Bush (Bush X)} because Agda cannot see it is algebraic.
+
+\paragraph*{Second-Order Containers}
+
+We need a new way to understand this. We introduce second-order containers
+
+\input{code/2Cont}
+
+There is a function interpretation:
+
+\input{code/2Func}
+
+
+There is a categorical interpretation
+
+\input{code/2app}
+
+The definition is derived by solving the following equation:
+
+\[ 2⟦ H ⟧ ⟦ F ⟧ X ≃ ⟦ app H F ⟧ X \]
+
+\AgdaFunction{2app}\AgdaSpace{}\AgdaBound{H} is an endofunctor of category of \AgdaRecord{Cont}. We omit the functorial action \AgdaFunction{app₁}.
+
+\paragraph*{The category of second-order containers}
+
+We present the morphisms of second-order containers:
+
+\begin{code}
+Some code here
+\end{code}
+
+They form a wild category. It has all infinitary products and coproducts, constructed pointwisely on shape.
+
+\paragraph*{Second-Order W-type}
+
+We want to calculate the least algebras of second-order container functors. That is we want to have ... :
+
+\[
+\begin{tikzcd}[column sep=large, row sep=large]
+  \mathsf{app}\,\mathsf{H}\,(\mathsf{2W}\,\mathsf{H})
+    \arrow[r, "\mathsf{app₁}\,\mathsf{H}\,(\mathsf{2fold}\,\alpha)"]
+    \arrow[d, "{2sup}"'] &
+  \mathsf{app₁}\,\mathsf{H}\,F
+    \arrow[d, "\alpha"] \\
+  \mathsf{2W}\,\mathsf{H}
+    \arrow[r, dashed, "\mathsf{2fold}\,\alpha"'] &
+  F
+\end{tikzcd}
+\]
+
+It follows:
+
+\[ 2W H ≃ app H (2W H) \]
+
+We actually need to generalised the equation to:
+
+\[ 2W-d H' H ≃ app H' (2W-d H' H) \]
+
+because ...
+
+We construct 2W by inductive-induction. It is constructed by splitting the domain \AgdaRecord{Cont} into \AgdaPrimitive{S : Set} and \AgdaPrimitive{P : S → Set}. 
+
+\input{code/2W}
+
+Then we can define some morphisms from the diagram:
+
+\input{code/2WSupFold}
+
+We can show that digram commutes and \AgdaFunction{fold2W} is unique.
+
+\paragraph*{Bush as 2W-type}
+
+Now we are ready to construct \AgdaDatatype{Bush}. We define \AgdaFunction{Hᶜ : 2Cont}, where its interpretation is \AgdaFunction{2⟦ Hᶜ ⟧ F X ≃ ⊤ ⊎ X × F (F X)}. The container representation \AgdaFunction{Bushᶜ} can be derived by applying \AgdaFunction{2W} on \AgdaFunction{Hᶜ}. Finally, the original \AgdaDatatype{Bush} is just the extension functor \AgdaFunction{⟦ Bushᶜ ⟧}.

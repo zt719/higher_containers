@@ -5,10 +5,6 @@
 \usepackage[utf8]{inputenc}
 \usepackage{tikz-cd}
 
-%TODO remove there two
-\usepackage{silence}
-\WarningFilter{latex}{Font shape}
-
 \bibliographystyle{plainurl}% the mandatory bibstyle
 
 \title{Dummy title} %TODO Please add
@@ -25,7 +21,7 @@
 
 \ccsdesc[100]{\textcolor{red}{Replace ccsdesc macro with valid one}} %TODO mandatory: Please choose ACM 2012 classifications from https://dl.acm.org/ccs/ccs_flat.cfm 
 
-\keywords{containers, type theory, semantics} %TODO mandatory; please add comma-separated list of keywords
+\keywords{} %TODO mandatory; please add comma-separated list of keywords
 
 \category{} %optional, e.g. invited paper
 
@@ -65,71 +61,12 @@
 This is abstract  
 \end{abstract}
 
-\section{Introduction}
-\label{sec:introduction}
-
-An introduction.
-
-\section{Background and Metatheory}
-\label{sec:metatheory}
-
-Our metatheory is Martin-L\"of type theory. Propositional equality \AgdaDatatype{\_≡\_} is represented exclusively by the identity type, which is eliminated by the \emph{J}-rule. We do not assume uip - the uniqueness of identity proofs, also known as the \emph{K}-rule, and we impose neither higher inductive structure nor truncation on any of the types considered.
-
-Under these assumptions, the categories studied in this paper are wild categories. Each consists of a class of objects and a \emph{class} of morphisms, equipped with identity morphisms and a composition operation that satisfy the left and right unit laws and associativity. Since identity types are not assumed to be propositions, the collections of morphisms are not required to be h-Sets.
-
-It is natural to formalise our development in Agda with \AgdaPragma{--without-K} flag. Accordingly, we postulate extensional equality for function types - \AgdaFunction{funExt}, together with its computation rule - \AgdaFunction{funExt-β}.
-
-\section{Basic Idea}
-\label{sec:basic}
-
-In this section, we introduce the denotational semantics of simple inductive types through a worked example, and then show how the construction generalises to containers and W-types. We then introduce
-the category of containers.
-
-Informally, the denotational semantics of inductive types is a correspondence between strictly-positive functors and their least fixed points, the latter being representable as strictly-positive inductive types. For example, the $\mathsf{Maybe}$ functor, defined as the operation $X \mapsto \mathbf{1} + X$ on \AgdaPrimitive{Type}, has the natural numbers \AgdaDatatype{ℕ} as its least fixed point.
-
-Formally, given any \AgdaBound{A : }\AgdaPrimitive{Type}, and any F-algebra \AgdaBound{α :} \AgdaPrimitive{Maybe }\AgdaBound{A → A}, there is an unique folding function \AgdaFunction{foldℕ}\AgdaSpace{}%
-\AgdaSymbol{:}\AgdaSpace{}%
-\AgdaSymbol{(}\AgdaFunction{Maybe}\AgdaSpace{}%
-\AgdaGeneralizable{A}\AgdaSpace{}%
-\AgdaSymbol{→}\AgdaSpace{}%
-\AgdaGeneralizable{A}\AgdaSymbol{)}\AgdaSpace{}%
-\AgdaSymbol{→}\AgdaSpace{}%
-\AgdaDatatype{ℕ}\AgdaSpace{}%
-\AgdaSymbol{→}\AgdaSpace{}%
-\AgdaGeneralizable{A}, such makes the following diagram commutes:
-
-\[
-\begin{tikzcd}[column sep=large, row sep=large]
-  \mathsf{Maybe}\,\mathbb{N}
-    \arrow[r, "{[\mathsf{zero},\,\mathsf{suc}]}"]
-    \arrow[d, "\mathsf{Maybe}\,(\mathsf{fold}\,\alpha)"'] &
-  \mathbb{N}
-    \arrow[d, dashed, "\mathsf{fold}\,\alpha"] \\
-  \mathsf{Maybe}\,A
-    \arrow[r, "\alpha"'] &
-  A
-\end{tikzcd}
-\]
-
-To formalise this explicitly, it suffices to construct two functions: \AgdaFunction{commuteℕ}, which witnesses that \AgdaFunction{foldℕ} is a homomorphism of $\mathsf{Maybe}$-algebras, and \AgdaFunction{uniquefoldℕ}, which proves the uniqueness. Together, these establish that $\mathbb{N}$ is the initial $\mathsf{Maybe}$-algebra.
-
-\paragraph*{Containers}
-\begin{itemize}
-  \item intuition, definition, extension
-  \item 
-\end{itemize}
-
-\section{Second-Order}
-
-This is second-order.
-
-\section{Higher-Order}
-
-This is higher-order.
-
-\section{Conclusion and Future Work}
-
-This is conclusion and future work.
+\input{sections/introduction}
+\input{sections/metatheory}
+\input{sections/basics}
+\input{sections/second}
+\input{sections/higher}
+\input{sections/conclusions}
 
 %%
 %% Bibliography

@@ -1,0 +1,8 @@
+\section{Metatheory}
+\label{sec:metatheory}
+
+Our metatheory is Martin-L\"of type theory. Propositional equality \AgdaDatatype{\_≡\_} is represented exclusively by the identity type, which is eliminated by the \emph{J}-rule. We do not assume uip - the uniqueness of identity proofs, also known as the \emph{K}-rule, and we impose neither higher inductive structure nor truncation on any of the types considered.
+
+Under these assumptions, the categories studied in this paper are wild categories. Each consists of a class of objects and a \emph{class} of morphisms, equipped with identity morphisms and a composition operation that satisfy the left and right unit laws and associativity. Since identity types are not assumed to be propositions, the collections of morphisms are not required to be h-Sets.
+
+It is natural to formalise our development in Agda with \AgdaPragma{--without-K} flag. Accordingly, we postulate extensional equality for function types - \AgdaFunction{funExt}, together with its computation rule - \AgdaFunction{funExt-β}.

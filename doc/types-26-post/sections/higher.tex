@@ -1,0 +1,51 @@
+\section{Higher-Order}
+
+In this section, we introduce a syntax and semantics of lambda-calculas with infinitary products and coproducts, and its noramlised syntax and semantics, ...
+
+\paragraph*{types, contexts and variables}
+
+To be able to talk about arbitary kinds of types, we build a syntax similar to the lambda-calculus. We define:
+
+\input{code/TyConVar}
+
+\paragraph*{unnormalised}
+
+Here is a syntax for term \AgdaDatatype{Tm}:
+
+\input{code/Tm}
+
+Explain more here. We have function interpretation and categorical interpretation:
+
+Some code and explaination.
+
+\paragraph*{normalised}
+
+Here is a normalised syntax, similar to the normal forms of lambda terms, but with all products and coproducts.
+
+\input{code/Nf}
+
+Explain more here. We have function interpretation and categorical interpretation:
+
+Some code and explaination.
+
+\paragraph*{normalisation and embedding}
+
+Say some thing about hereditary substitution and eta-expansion here. Those amounts to a normalisation function. There is also a trivial embedding:
+
+\input{code/NormEmb}
+
+explain more here.
+
+\paragraph*{higher-order containers}
+
+Higher-order containers are special cases of normal forms when the context is empty:
+
+\input{code/HCont}
+
+\paragraph*{higher-order W-types}
+
+However, with the current setting, we cannot have any W-type beyond \AgdaFunction{2W}. We sketch the proof here:
+
+Some code and explanation.
+
+To fix this, we may need to add $\mu$ and $\nu$ into the syntax and redo all the semantics and constructions.

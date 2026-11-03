@@ -35,7 +35,7 @@ The definition is derived by solving the following equation:
 
 \[ 2⟦ H ⟧ ⟦ F ⟧ X ≃ ⟦ app H F ⟧ X \]
 
-\AgdaFunction{2app}\AgdaSpace{}\AgdaBound{H} is an endofunctor of category of \AgdaRecord{Cont}. We omit the functorial action \AgdaFunction{app₁}.
+\AgdaFunction{app}\AgdaSpace{}\AgdaBound{H} is an endofunctor of category of \AgdaRecord{Cont}. We omit the functorial action \AgdaFunction{app₁}.
 
 \paragraph*{The category of second-order containers}
 
@@ -74,7 +74,11 @@ We actually need to generalised the equation to:
 
 because ...
 
-We construct 2W by inductive-induction. It is constructed by splitting the domain \AgdaRecord{Cont} into \AgdaPrimitive{S : Set} and \AgdaPrimitive{P : S → Set}. 
+We construct 2W by inductive-induction. It is constructed by splitting the domain \AgdaRecord{Cont} into \AgdaPrimitive{S : Type} and \AgdaPrimitive{P : S → Type}. 
+
+\input{code/2W-d}
+
+Then 2W is just a special case:
 
 \input{code/2W}
 

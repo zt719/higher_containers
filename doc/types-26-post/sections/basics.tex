@@ -1,12 +1,33 @@
 \section{Basics}
 \label{sec:basics}
 
-In this section, we introduce the denotational semantics of simple inductive types through a worked example, and then show how the construction generalises to containers and W-types. We then introduce
-the category of containers.
+In this section, we introduce the denotational semantics of simple inductive
+types through a worked example, and then generalises to containers and W-types.
+We then introduce the category of containers.
 
-Informally, the denotational semantics of inductive types is a correspondence between strictly-positive functors and their least fixed points, the latter being representable as strictly-positive inductive types. For example, the $\mathsf{Maybe}$ functor, defined as the operation $X \mapsto \mathbf{1} + X$ on \AgdaPrimitive{Type}, has the natural numbers \AgdaDatatype{ℕ} as its least fixed point.
+\paragraph*{Semantics of Types}
 
-Formally, given any \AgdaBound{A : }\AgdaPrimitive{Type}, and any F-algebra \AgdaBound{α :} \AgdaPrimitive{Maybe }\AgdaBound{A → A}, there is an unique folding function \AgdaFunction{foldℕ}\AgdaSpace{}%
+Informally, the semantics of inductive types says they are exactly represented
+as the intial algebras of endofunctors of \AgdaPrimitive{Type}. For example,
+the natural number and its unique constructors
+\AgdaSymbol{(}%
+\AgdaDatatype{ℕ}\AgdaSpace{}%
+\AgdaSymbol{,}\AgdaSpace{}%
+\AgdaInductiveConstructor{[z,s]}\AgdaSymbol{)}\AgdaSpace{}%
+is the inital algebra of functor
+\AgdaDatatype{Maybe}\AgdaSpace{}%
+\AgdaBound{X}\AgdaSpace{}%
+\AgdaSymbol{=}\AgdaSpace{}%
+\AgdaRecord{1}\AgdaSpace{}%
+\AgdaDatatype{+}\AgdaSpace{}%
+\AgdaBound{X}%
+. Formally, we say given any other Maybe-algebra
+\AgdaSymbol{(}%
+\AgdaBound{A}\AgdaSpace{}%
+\AgdaSymbol{,}\AgdaSpace{}%
+\AgdaBound{α}\AgdaSymbol{)}\AgdaSpace{}%
+, there is an unique folding function
+\AgdaFunction{foldℕ}\AgdaSpace{}%
 \AgdaSymbol{:}\AgdaSpace{}%
 \AgdaSymbol{(}\AgdaFunction{Maybe}\AgdaSpace{}%
 \AgdaGeneralizable{A}\AgdaSpace{}%
@@ -15,26 +36,113 @@ Formally, given any \AgdaBound{A : }\AgdaPrimitive{Type}, and any F-algebra \Agd
 \AgdaSymbol{→}\AgdaSpace{}%
 \AgdaDatatype{ℕ}\AgdaSpace{}%
 \AgdaSymbol{→}\AgdaSpace{}%
-\AgdaGeneralizable{A}, such makes the following diagram commutes:
+\AgdaGeneralizable{A}%
+, such makes the following diagram commutes:
 
 \[
-\begin{tikzcd}[column sep=large, row sep=large]
-  \mathsf{Maybe}\,\mathbb{N}
-    \arrow[r, "\mathsf{Maybe}\,(\mathsf{fold}\,\alpha)"]
-    \arrow[d, "{[\mathsf{zero},\,\mathsf{suc}]}"'] &
-  \mathsf{Maybe}\,A
-    \arrow[d, "\alpha"] \\
-  \mathbb{N}
-    \arrow[r, dashed, "\mathsf{fold}\,\alpha"'] &
-  A
+\begin{tikzcd}[column sep=huge, row sep=large]
+  \AgdaFunction{Maybe}\,\AgdaDatatype{ℕ}
+    \arrow[r, "\AgdaFunction{Maybe₁}\,\AgdaSymbol{(}\AgdaFunction{foldℕ}\,
+      \AgdaBound{α}\AgdaSymbol{)}"]
+    \arrow[d, "\AgdaInductiveConstructor{[z,s]}"] &
+  \AgdaFunction{Maybe}\,\AgdaBound{A}
+    \arrow[d, "\AgdaBound{α}"] \\
+  \AgdaDatatype{ℕ}
+    \arrow[r, dashed, "\AgdaFunction{foldℕ}\,\AgdaBound{α}"] &
+  \AgdaBound{A}
 \end{tikzcd}
 \]
 
-To formalise this explicitly, it suffices to construct two functions: \AgdaFunction{commuteℕ}, which witnesses that \AgdaFunction{foldℕ} is a homomorphism of $\mathsf{Maybe}$-algebras, and \AgdaFunction{uniquefoldℕ}, which proves the uniqueness. Together, these establish that ℕ is the initial $\mathsf{Maybe}$-algebra.
+To formalise this explicitly, it suffices to construct two functions:
+\AgdaFunction{commuteℕ}, which witnesses that \AgdaFunction{foldℕ} is a
+homomorphism, and \AgdaFunction{uniquefoldℕ}, which proves the
+uniqueness condition. Together, these establish that \AgdaDatatype{ℕ} is the
+initial algebra.
 
 \paragraph*{Containers}
-\begin{itemize}
-  \item intuition
-  \item defition
-  \item extension functor
-\end{itemize}
+
+While the Maybe functor can be regarded as the polynomial $f(x) = 1 + x$ on
+types, this can be generalised to arbitrary polynomials of the form
+$f(x) = a₀ + a₁ x + a₂ x² + ...$, where each coefficient $aₙ$ is a constant.
+
+This leads to the definition of containers:
+
+\input{code/cont}
+
+where the type \AgdaBound{S} is called the \emph{shape}, encoding the number
+of monomials, and the family \AgdaBound{P} is called the position, encoding
+the power of \AgdaBound{X} for each monomial. The \emph{extension} or
+interpretation functors decode containers back to polymonial functions:
+
+\input{code/extension}
+
+\paragraph*{W-type}
+
+Getting back to semantics of inductive types, we ask a question: does the
+initial algebra of any container functor exist? The answer is positive, as we
+can construct so called the \emph{W-type}:
+
+\input{code/w}
+
+It can be shown that
+\AgdaSymbol{(}\AgdaDatatype{W}\AgdaSymbol{,} \AgdaInductiveConstructor{sup}
+\AgdaSymbol{)}
+is indeed the initial algebra.
+The proof is straight forward, by first constructing the folding function,
+then proving that for any other algebra
+\AgdaSymbol{(}\AgdaBound{A}\AgdaSymbol{,}\AgdaBound{α}\AgdaSymbol{)}
+the following diagram commutes:
+
+\[
+\begin{tikzcd}[column sep=huge, row sep=large]
+  \AgdaFunction{⟦}\,\AgdaBound{SP}\,\AgdaFunction{⟧}\,
+  \AgdaSymbol{(}\,\AgdaDatatype{W}\,\AgdaBound{SP}\AgdaSymbol{)}
+  \arrow[r, "\AgdaFunction{⟦}\,\AgdaBound{SP}\,\AgdaFunction{⟧₁}\,
+    \AgdaSymbol{(}\AgdaFunction{foldW}\,\AgdaBound{α}\AgdaSymbol{)}"]
+    \arrow[d, "\AgdaInductiveConstructor{sup}"] &
+  \AgdaFunction{⟦}\,\AgdaBound{SP}\,\AgdaFunction{⟧}\,\AgdaBound{A}
+    \arrow[d, "\AgdaBound{α}"] \\
+  \AgdaDatatype{W}\,\AgdaBound{SP}
+    \arrow[r, dashed, "\AgdaFunction{foldW}\,\AgdaBound{α}"] &
+  \AgdaBound{A}
+\end{tikzcd}
+\]
+
+\paragraph*{Category of Containers}
+
+Containers represent data structures that contain type \AgdaBound{X}. for
+example list, binary tree, stream. From a programming point of view, it is very
+natural to define a transition from one structure to another. For example, a
+function \input{code/flatten}.
+
+From a programming point of view, this class of polymonial functors are
+exactly generic types or branching trees. For example
+\AgdaDatatype{List}\AgdaSpace{}%
+\AgdaBound{X}\AgdaSpace{}%
+\AgdaSymbol{=}\AgdaSpace{}%
+\AgdaRecord{1}\AgdaSpace{}%
+\AgdaDatatype{+}\AgdaSpace{}%
+\AgdaBound{X}\AgdaSpace{}%
+\AgdaFunction{×}\AgdaSpace{}%
+\AgdaDatatype{List}\AgdaSpace{}%
+\AgdaBound{X}\AgdaSpace{}%
+is a unary branching tree, while
+\AgdaDatatype{Tree}\AgdaSpace{}%
+\AgdaBound{X}\AgdaSpace{}%
+\AgdaSymbol{=}\AgdaSpace{}%
+\AgdaRecord{1}\AgdaSpace{}%
+\AgdaDatatype{+}\AgdaSpace{}%
+\AgdaBound{X}\AgdaSpace{}%
+\AgdaFunction{×}\AgdaSpace{}%
+\AgdaDatatype{Tree}\AgdaSpace{}%
+\AgdaBound{X}\AgdaSpace{}%
+\AgdaFunction{×}\AgdaSpace{}%
+\AgdaDatatype{Tree}\AgdaSpace{}%
+\AgdaBound{X}\AgdaSpace{}%
+is a binary branching tree.
+
+A homomorphism between two containers 
+
+Syntactically, this kind of transitions can be described a morphism
+
+\input{code/conthom}

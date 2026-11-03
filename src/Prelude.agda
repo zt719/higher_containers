@@ -1,30 +1,29 @@
-module Prelude where
+{-# OPTIONS --cubical --guardedness #-}
 
-open import Level using (Level; _⊔_)
-open import Axiom.Extensionality.Heterogeneous
-open import Relation.Binary.PropositionalEquality using (_≡_; refl)
-open import Relation.Binary.HeterogeneousEquality using (_≅_; refl; ≡-to-≅; ≅-to-≡)
+open import Cubical.Foundations.Prelude public
+open import Cubical.Foundations.Function public
+open import Cubical.Data.Unit public
+  renaming (Unit to ⊤)
+open import Cubical.Data.Empty public
+  using (⊥)
+  renaming (elim to ⊥-elim)
+open import Cubical.Data.Sigma public
+open import Cubical.Data.Sum public
 
-private
-  variable
-    ℓ ℓ′ ℓ″ : Level
+id : ∀ {ℓ} {A : Type ℓ} → A → A
+id a = a
 
-------------------------------------------------------------------------
--- Function extensionality for heterogeneous equality
+case : ∀ {ℓ ℓ′ ℓ″} {A : Type ℓ}
+       {B : Type ℓ′} {C : Type ℓ″}
+     → (A → C)
+     → (B → C)
+     → A ⊎ B → C
+case f g (inl a) = f a
+case f g (inr b) = g b
 
-postulate
-  ext : Extensionality ℓ ℓ′
-
-funExt : {A : Set ℓ}
-         {B : A → Set ℓ′}
-         {f g : (x : A) → B x}
-         → ((x : A) → f x ≅ g x)
-         → f ≅ g
-funExt = ext (λ x → refl)
-
-funExt≡ : {A : Set ℓ}
-          {B : A → Set ℓ′}
-          {f g : (x : A) → B x}
-          → ((x : A) → f x ≡ g x)
-          → f ≡ g
-funExt≡ h = ≅-to-≡ (funExt λ x → ≡-to-≅ (h x))
+pair : ∀ {ℓ ℓ′ ℓ″} {A : Type ℓ}
+       {B : Type ℓ′} {C : Type ℓ″}
+     → (A → B)
+     → (A → C)
+     → A → B × C
+pair f g a = f a , g a     

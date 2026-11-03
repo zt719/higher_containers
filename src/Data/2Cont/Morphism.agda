@@ -1,16 +1,15 @@
-{-# OPTIONS --without-K #-}
+{-# OPTIONS --cubical --guardedness #-}
 
 module Data.2Cont.Morphism where
 
-open import Data.2Cont.Base
-open import Data.Product
-open import Data.Sum
+open import Prelude
 open import Data.Cont
+open import Data.2Cont.Base
 
 ------------------------------------------------------------------------
 -- Definition
 
-record _→²ᶜ_ (H J : 2Cont) : Set₁ where
+record _→²ᶜ_ (H J : 2Cont) : Type₁ where
   pattern
   inductive
   constructor _◃_+_+_
@@ -31,11 +30,11 @@ app→²ᶜS {S ◃ PX + PF + RF} {T ◃ QX + QF + LF} (αS ◃ αPX + αPF + α
   = αS s , λ qF → let (t , g) = f (αPF s qF) in t , λ q → app→²ᶜS (αRF s qF) F (g q)
 
 app→²ᶜP : {H J : 2Cont} (α : H →²ᶜ J) (F : Cont) (s : appS H F) → appP J F (app→²ᶜS α F s) → appP H F s
-app→²ᶜP {S ◃ PX + PF + RF} {T ◃ QX + QF + LF} (αS ◃ αPX + αPF + αRF) F (s , f) (inj₁ pX) =
-  inj₁ (αPX s pX)
-app→²ᶜP {S ◃ PX + PF + RF} {T ◃ QX + QF + LF} (αS ◃ αPX + αPF + αRF) F (s , f) (inj₂ (pF , q , rp)) =
+app→²ᶜP {S ◃ PX + PF + RF} {T ◃ QX + QF + LF} (αS ◃ αPX + αPF + αRF) F (s , f) (inl pX) =
+  inl (αPX s pX)
+app→²ᶜP {S ◃ PX + PF + RF} {T ◃ QX + QF + LF} (αS ◃ αPX + αPF + αRF) F (s , f) (inr (pF , q , rp)) =
   let (t , g) = f (αPF s pF) in
-    inj₂ (αPF s pF , q , app→²ᶜP (αRF s pF) F (g q) rp)
+    inr (αPF s pF , q , app→²ᶜP (αRF s pF) F (g q) rp)
 
 app→²ᶜ : {H J : 2Cont}
          → H →²ᶜ J

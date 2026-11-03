@@ -1,4 +1,4 @@
-{-# OPTIONS --without-K #-}
+{-# OPTIONS --cubical --guardedness #-}
 
 module Data.Cont where
 

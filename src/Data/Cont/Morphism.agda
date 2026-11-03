@@ -1,10 +1,9 @@
-{-# OPTIONS --without-K #-}
+{-# OPTIONS --cubical --guardedness #-}
 
 module Data.Cont.Morphism where
 
-open import Data.Product
+open import Prelude
 open import Data.Cont.Base
-open import Function
 
 private
   variable
@@ -14,7 +13,7 @@ private
 -- Morphism
 
 infixr 0 _→ᶜ_
-record _→ᶜ_ (SP TQ : Cont) : Set where
+record _→ᶜ_ (SP TQ : Cont) : Type where
   constructor _◃_
   pattern  
   open Cont SP
@@ -33,5 +32,5 @@ _∘ᶜ_ : TQ →ᶜ UV → SP →ᶜ TQ → SP →ᶜ UV
 ------------------------------------------------------------------------
 -- Interpretation
 
-⟦_⟧→ᶜ : SP →ᶜ TQ → (X : Set) → ⟦ SP ⟧ X → ⟦ TQ ⟧ X
+⟦_⟧→ᶜ : SP →ᶜ TQ → (X : Type) → ⟦ SP ⟧ X → ⟦ TQ ⟧ X
 ⟦ fS ◃ fP ⟧→ᶜ X (s , f) = fS s , f ∘ fP s

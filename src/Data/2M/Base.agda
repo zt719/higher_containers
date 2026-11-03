@@ -1,18 +1,17 @@
-{-# OPTIONS --guardedness #-}
+{-# OPTIONS --cubical --guardedness #-}
 
 module Data.2M.Base where
 
-open import Data.Product using (Σ-syntax; _×_; _,_)
-open import Data.Sum using (_⊎_; inj₁; inj₂)
-open import Data.Cont using (Cont; _→ᶜ_; _◃_)
-open import Data.2Cont using (2Cont; _◃_+_+_; appS; appP; app)
+open import Prelude
+open import Data.Cont
+open import Data.2Cont
 
 ------------------------------------------------------------------------
 -- Definition
 
-record 2MS-d (H' H : 2Cont) : Set
+record 2MS-d (H' H : 2Cont) : Type
 
-data 2MP-d (H' H : 2Cont) (2ws : 2MS-d H' H) : Set
+data 2MP-d (H' H : 2Cont) (2ws : 2MS-d H' H) : Type
 
 record 2MS-d H' H where
   coinductive
@@ -30,10 +29,10 @@ data 2MP-d H' H ws where
              Σ[ q ∈ 2MP-d H H t ] 2MP-d (RF s pF) H (g q))
          → 2MP-d H' H ws
 
-2MS : 2Cont → Set
+2MS : 2Cont → Type
 2MS H = 2MS-d H H
 
-2MP : (H : 2Cont) → 2MS H → Set
+2MP : (H : 2Cont) → 2MS H → Type
 2MP H = 2MP-d H H
 
 2M-d : 2Cont → 2Cont → Cont
@@ -51,20 +50,18 @@ module _ {H : 2Cont} where
   2infS-d {S ◃ PX + PF + RF} ms =
     let s = ms .2MS-d.s
         f = ms .2MS-d.f in
-    s , λ pF →
-    let (t , g) = f pF in
-    t , λ q → 2infS-d {RF s pF} (g q)
+    s , λ pF → let (t , g) = f pF in
+      t , λ q → 2infS-d {RF s pF} (g q)
 
-  2infP-d : {H′ : 2Cont}
-            (s : 2MS-d H′ H)
+  2infP-d : {H′ : 2Cont} (s : 2MS-d H′ H)
             → appP H′ (2M H) (2infS-d s)
             → 2MP-d H′ H s
-  2infP-d {S ◃ PX + PF + RF} ms (inj₁ pX) =
+  2infP-d {S ◃ PX + PF + RF} ms (inl pX) =
     posX pX
-  2infP-d {S ◃ PX + PF + RF} ms (inj₂ (pF , q , rp)) =
+  2infP-d {S ◃ PX + PF + RF} ms (inr (pF , q , rp)) =
     let s = ms .2MS-d.s
         f = ms .2MS-d.f
-        (t , g) = f pF  in
+        (t , g) = f pF in
     posF (pF , q , 2infP-d {RF s pF} (g q) rp)
 
   2inf-d : {H′ : 2Cont} → 2M-d H′ H →ᶜ app H′ (2M H)
@@ -73,6 +70,29 @@ module _ {H : 2Cont} where
   2inf : 2M H →ᶜ app H (2M H)
   2inf = 2inf-d
 
+------------------------------------------------------------------------
+-- Infimum inverse
+
+  2infS⁻-d : {H′ : 2Cont} → appS H′ (2M H) → 2MS-d H′ H
+  2infS⁻-d {S ◃ PX + PF + RF} (s , f) .2MS-d.s = s
+  2infS⁻-d {S ◃ PX + PF + RF} (s , f) .2MS-d.f =
+    λ pF → let (t , g) = f pF in
+      t , λ q → 2infS⁻-d {RF s pF} (g q)
+
+  2infP⁻-d : {H′ : 2Cont} (s : appS H′ (2M H))
+             → 2MP-d H′ H (2infS⁻-d s)
+             → appP H′ (2M H) s
+  2infP⁻-d {S ◃ PX + PF + RF} (s , f) (posX pX) =
+    inl pX
+  2infP⁻-d {S ◃ PX + PF + RF} (s , f) (posF (pF , q , rp)) =
+    let (t , g) = f pF in
+      inr (pF , q , 2infP⁻-d {RF s pF} (g q) rp)
+
+  2inf⁻-d : {H′ : 2Cont} → app H′ (2M H) →ᶜ 2M-d H′ H
+  2inf⁻-d = 2infS⁻-d ◃ 2infP⁻-d
+
+  2inf⁻ : app H (2M H) →ᶜ 2M H
+  2inf⁻ = 2inf⁻-d
 
 ------------------------------------------------------------------------
 -- Unfolding
@@ -96,10 +116,11 @@ module _ {H : 2Cont} {TQ : Cont} (α : TQ →ᶜ app H TQ) where
     λ pF → let (t , g) = f pF in
       unfold2MS t , λ q → auxS {RF s pF} (g (unfold2MP t q))
 
-  auxP {S ◃ PX + PF + RF} (s , f) (posX pX) = inj₁ pX
+  auxP {S ◃ PX + PF + RF} (s , f) (posX pX) = inl pX
   auxP {S ◃ PX + PF + RF} (s , f) (posF (pF , q , rp)) =
     let (t , g) = f pF in
-      inj₂ (pF , unfold2MP t q , auxP {RF s pF} (g (unfold2MP t q)) rp)
+      inr (pF , unfold2MP t q ,
+        auxP {RF s pF} (g (unfold2MP t q)) rp)
 
   unfold2MS s = auxS (αS s)
 

@@ -1,16 +1,10 @@
-{-# OPTIONS --without-K #-}
+{-# OPTIONS --cubical --guardedness #-}
 
 module Data.Cont.Categorical where
 
-open import Data.Unit
-open import Data.Empty
-open import Data.Product renaming (<_,_> to pair)
-open import Data.Sum renaming ([_,_] to case)
-open import Data.Nat
-open import Data.Fin
+open import Prelude hiding (I)
 open import Data.Cont.Base
 open import Data.Cont.Morphism
-open import Function
 
 private
   variable
@@ -40,49 +34,49 @@ _×ᶜ_ : Cont → Cont → Cont
 _×ᶜ₁_ : SP →ᶜ TQ → SP' →ᶜ TQ' → SP ×ᶜ SP' →ᶜ TQ ×ᶜ TQ'
 (g ◃ h) ×ᶜ₁ (g' ◃ h')
   = (λ (s , s') → g s , g' s')
-  ◃ λ{ (s , s') (inj₁ p) → inj₁ (h s p) ; (s , s') (inj₂ p') → inj₂ (h' s' p') }
+  ◃ λ{ (s , s') (inl p) → inl (h s p) ; (s , s') (inr p') → inr (h' s' p') }
 
-proj₁ᶜ : SP ×ᶜ TQ →ᶜ SP
-proj₁ᶜ = proj₁ ◃ λ{ (S , T) p → inj₁ p }
+projlᶜ : SP ×ᶜ TQ →ᶜ SP
+projlᶜ = fst ◃ λ{ (S , T) p → inl p }
 
-proj₂ᶜ : SP ×ᶜ TQ →ᶜ TQ
-proj₂ᶜ = proj₂ ◃ λ{ (S , T) q → inj₂ q }
+projrᶜ : SP ×ᶜ TQ →ᶜ TQ
+projrᶜ = snd ◃ λ{ (S , T) q → inr q }
 
-pairᶜ : SP →ᶜ TQ → SP →ᶜ TQ' → SP →ᶜ TQ ×ᶜ TQ'
-pairᶜ (f ◃ g) (f' ◃ g') = pair f f' ◃ λ{ s (inj₁ p) → g s p ; s (inj₂ q) → g' s q }
+-- pairᶜ : SP →ᶜ TQ → SP →ᶜ TQ' → SP →ᶜ TQ ×ᶜ TQ'
+-- pairᶜ (f ◃ g) (f' ◃ g') = pair f f' ◃ λ{ s (inl p) → g s p ; s (inr q) → g' s q }
 
 infixr 1 _⊎ᶜ_
 _⊎ᶜ_ : Cont → Cont → Cont
-(S ◃ P) ⊎ᶜ (T ◃ Q) = S ⊎ T ◃ λ{ (inj₁ s) → P s ; (inj₂ t) → Q t }
+(S ◃ P) ⊎ᶜ (T ◃ Q) = S ⊎ T ◃ λ{ (inl s) → P s ; (inr t) → Q t }
 
 _⊎ᶜ₁_ : SP →ᶜ TQ → SP' →ᶜ TQ' → SP ⊎ᶜ SP' →ᶜ TQ ⊎ᶜ TQ'
 (g ◃ h) ⊎ᶜ₁ (g' ◃ h')
-  = (λ{ (inj₁ s) → inj₁ (g s) ; (inj₂ s') → inj₂ (g' s') })
-  ◃ λ{ (inj₁ s) p → h s p ; (inj₂ s') p' → h' s' p' }
+  = (λ{ (inl s) → inl (g s) ; (inr s') → inr (g' s') })
+  ◃ λ{ (inl s) p → h s p ; (inr s') p' → h' s' p' }
 
-inj₁ᶜ : SP →ᶜ SP ⊎ᶜ TQ
-inj₁ᶜ = inj₁ ◃ λ s p → p
+inlᶜ : SP →ᶜ SP ⊎ᶜ TQ
+inlᶜ = inl ◃ λ s p → p
 
-inj₂ᶜ : TQ →ᶜ SP ⊎ᶜ TQ
-inj₂ᶜ = inj₂ ◃ λ s q → q
+inrᶜ : TQ →ᶜ SP ⊎ᶜ TQ
+inrᶜ = inr ◃ λ s q → q
 
 caseᶜ : SP →ᶜ TQ → SP' →ᶜ TQ → SP ⊎ᶜ SP' →ᶜ TQ
-caseᶜ (f ◃ g) (f' ◃ g') = case f  f' ◃ λ{ (inj₁ s) p → g s p ; (inj₂ s') q → g' s' q }
+caseᶜ (f ◃ g) (f' ◃ g') = case f  f' ◃ λ{ (inl s) p → g s p ; (inr s') q → g' s' q }
 
 -- Product and coproduct
 
 private
   variable
-    I : Set
+    I : Type
     F G : I → Cont
 
-Πᶜ : (I : Set) (F : I → Cont) → Cont
+Πᶜ : (I : Type) (F : I → Cont) → Cont
 Πᶜ I F = ((i : I) → let S ◃ P = F i in S)
   ◃ λ f → Σ[ i ∈ I ] let S ◃ P = F i in P (f i)
 
 infix 2 Πᶜ-syntax
 
-Πᶜ-syntax : (I : Set) (F : I → Cont) → Cont
+Πᶜ-syntax : (I : Type) (F : I → Cont) → Cont
 Πᶜ-syntax = Πᶜ
 
 syntax Πᶜ-syntax A (λ x → B) = Πᶜ[ x ∈ A ] B
@@ -94,13 +88,13 @@ syntax Πᶜ-syntax A (λ x → B) = Πᶜ[ x ∈ A ] B
 projᶜ : (i : I) → Πᶜ[ i ∈ I ] F i →ᶜ F i
 projᶜ i = (λ f → f i) ◃ λ s p → i , p
 
-Σᶜ : (I : Set) (F : I → Cont) → Cont
+Σᶜ : (I : Type) (F : I → Cont) → Cont
 Σᶜ I F = (Σ[ i ∈ I ] let S ◃ P = F i in S)
   ◃ λ (i , s) → let S ◃ P = F i in P s
 
 infix 2 Σᶜ-syntax
 
-Σᶜ-syntax : (I : Set) (F : I → Cont) → Cont
+Σᶜ-syntax : (I : Type) (F : I → Cont) → Cont
 Σᶜ-syntax = Σᶜ
 
 syntax Σᶜ-syntax A (λ x → B) = Σᶜ[ x ∈ A ] B
@@ -115,30 +109,30 @@ injᶜ i = (λ s → i , s) ◃ λ s p → p
 -- Commutative semiring
 
 lunit⊎ᶜ : ⊥ᶜ ⊎ᶜ SP →ᶜ SP
-lunit⊎ᶜ = (λ{ (inj₂ s) → s }) ◃ λ{ (inj₂ s) p → p }
+lunit⊎ᶜ = (λ{ (inr s) → s }) ◃ λ{ (inr s) p → p }
 
 runit⊎ᶜ : SP ⊎ᶜ ⊥ᶜ →ᶜ SP
-runit⊎ᶜ = (λ{ (inj₁ s) → s }) ◃ λ{ (inj₁ s) p → p }
+runit⊎ᶜ = (λ{ (inl s) → s }) ◃ λ{ (inl s) p → p }
 
 comm⊎ᶜ : SP ⊎ᶜ TQ →ᶜ TQ ⊎ᶜ SP
-comm⊎ᶜ = (λ{ (inj₁ s) → inj₂ s ; (inj₂ t) → inj₁ t }) ◃ λ{ (inj₁ t) q → q ; (inj₂ s) p → p }
+comm⊎ᶜ = (λ{ (inl s) → inr s ; (inr t) → inl t }) ◃ λ{ (inl t) q → q ; (inr s) p → p }
 
 assoc⊎ᶜ : (SP ⊎ᶜ TQ) ⊎ᶜ UV →ᶜ SP ⊎ᶜ (TQ ⊎ᶜ UV)
-assoc⊎ᶜ = (λ{ (inj₁ (inj₁ s)) → inj₁ s ; (inj₁ (inj₂ t)) → inj₂ (inj₁ t) ; (inj₂ u) → inj₂ (inj₂ u) })
-  ◃ λ{ (inj₁ (inj₁ s)) p → p ; (inj₁ (inj₂ t)) q → q ; (inj₂ u) v → v }
+assoc⊎ᶜ = (λ{ (inl (inl s)) → inl s ; (inl (inr t)) → inr (inl t) ; (inr u) → inr (inr u) })
+  ◃ λ{ (inl (inl s)) p → p ; (inl (inr t)) q → q ; (inr u) v → v }
 
 lunit×ᶜ : ⊤ᶜ ×ᶜ SP →ᶜ SP
-lunit×ᶜ = (λ (tt , s) → s) ◃ λ (tt , s) p → inj₂ p
+lunit×ᶜ = (λ (tt , s) → s) ◃ λ (tt , s) p → inr p
 
 runit×ᶜ : SP ×ᶜ ⊤ᶜ →ᶜ SP
-runit×ᶜ = (λ (s , tt) → s) ◃ λ (s , tt) p → inj₁ p
+runit×ᶜ = (λ (s , tt) → s) ◃ λ (s , tt) p → inl p
 
 comm×ᶜ : SP ×ᶜ TQ →ᶜ TQ ×ᶜ SP
-comm×ᶜ = (λ (s , t) → t , s) ◃ λ{ (s , t) (inj₁ q) → inj₂ q ; (s , t) (inj₂ p) → inj₁ p }
+comm×ᶜ = (λ (s , t) → t , s) ◃ λ{ (s , t) (inl q) → inr q ; (s , t) (inr p) → inl p }
 
 assoc×ᶜ : (SP ×ᶜ TQ) ×ᶜ UV →ᶜ SP ×ᶜ (TQ ×ᶜ UV)
 assoc×ᶜ = (λ ((s , t) , u) → s , t , u)
-  ◃ λ{ ((s , t) , u) (inj₁ p) → inj₁ (inj₁ p) ; ((s , t) , u) (inj₂ (inj₁ q)) → inj₁ (inj₂ q) ; ((s , t) , u) (inj₂ (inj₂ v)) → inj₂ v }
+  ◃ λ{ ((s , t) , u) (inl p) → inl (inl p) ; ((s , t) , u) (inr (inl q)) → inl (inr q) ; ((s , t) , u) (inr (inr v)) → inr v }
 
 labsᶜ : ⊥ᶜ ×ᶜ SP →ᶜ ⊥ᶜ
 labsᶜ = (λ ()) ◃ λ ()
@@ -147,18 +141,18 @@ rabsᶜ : SP ×ᶜ ⊥ᶜ →ᶜ ⊥ᶜ
 rabsᶜ = (λ ()) ◃ λ ()
 
 ldistrᶜ : SP ×ᶜ (TQ ⊎ᶜ UV) →ᶜ SP ×ᶜ TQ ⊎ᶜ SP ×ᶜ UV
-ldistrᶜ = (λ{ (s , inj₁ t) → inj₁ (s , t) ; (s , inj₂ u) → inj₂ (s , u) })
-        ◃ λ{ (s , inj₁ t) (inj₁ p) → inj₁ p ; (s , inj₁ t) (inj₂ q) → inj₂ q
-           ; (s , inj₂ u) (inj₁ p) → inj₁ p ; (s , inj₂ u) (inj₂ v) → inj₂ v }
+ldistrᶜ = (λ{ (s , inl t) → inl (s , t) ; (s , inr u) → inr (s , u) })
+        ◃ λ{ (s , inl t) (inl p) → inl p ; (s , inl t) (inr q) → inr q
+           ; (s , inr u) (inl p) → inl p ; (s , inr u) (inr v) → inr v }
 
 rdistrᶜ : (SP ⊎ᶜ TQ) ×ᶜ UV →ᶜ SP ×ᶜ UV ⊎ᶜ TQ ×ᶜ UV
-rdistrᶜ = (λ{ (inj₁ s , u) → inj₁ (s , u) ; (inj₂ t , u) → inj₂ (t , u) })
-        ◃ λ{ (inj₁ s , u) (inj₁ p) → inj₁ p ; (inj₁ s , u) (inj₂ v) → inj₂ v
-           ; (inj₂ t , u) (inj₁ q) → inj₁ q ; (inj₂ t , u) (inj₂ v) → inj₂ v }
+rdistrᶜ = (λ{ (inl s , u) → inl (s , u) ; (inr t , u) → inr (t , u) })
+        ◃ λ{ (inl s , u) (inl p) → inl p ; (inl s , u) (inr v) → inr v
+           ; (inr t , u) (inl q) → inl q ; (inr t , u) (inr v) → inr v }
 
 -- Infinitary commutative semiring
 
-module _ (I : Set) (J : I → Set) (F : (i : I) → J i → Cont) where
+module _ (I : Type) (J : I → Type) (F : (i : I) → J i → Cont) where
 
   assocΣᶜ : Σᶜ[ (i , j) ∈ Σ I J ] F i j →ᶜ Σᶜ[ i ∈ I ] Σᶜ[ j ∈ J i ] F i j
   assocΣᶜ = (λ ((i , j) , c) → i , j , c) ◃ λ s p → p
@@ -205,15 +199,20 @@ _⊚ᶜ₁_ : SP →ᶜ TQ → SP' →ᶜ TQ' → SP ⊚ᶜ SP' →ᶜ TQ ⊚ᶜ
 
 -- Finitary compositions
 
+open import Cubical.Data.Nat
+open import Cubical.Data.Fin
+
+{-
 Fin⊚ᶜ : {n : ℕ} → (Fin n → Cont) → Cont
 Fin⊚ᶜ f = Fin⊚ᶜS f ◃ Fin⊚ᶜP f
   where
-  Fin⊚ᶜS : {n : ℕ} → (Fin n → Cont) → Set
+  Fin⊚ᶜS : {n : ℕ} → (Fin n → Cont) → Type
   Fin⊚ᶜS {zero} f = ⊤
   Fin⊚ᶜS {suc n} f with f zero
   ... | S ◃ P = Σ[ s ∈ S ] (P s → Fin⊚ᶜS {n} (f ∘ suc))
 
-  Fin⊚ᶜP : {n : ℕ} (f : Fin n → Cont) → Fin⊚ᶜS {n} f → Set
+  Fin⊚ᶜP : {n : ℕ} (f : Fin n → Cont) → Fin⊚ᶜS {n} f → Type
   Fin⊚ᶜP {zero} f tt = ⊤
   Fin⊚ᶜP {suc n} f (s , g) with f zero
   ... | S ◃ P = Σ[ p ∈ P s ] Fin⊚ᶜP {n} (f ∘ suc) (g p)
+-}

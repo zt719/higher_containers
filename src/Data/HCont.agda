@@ -1,29 +1,27 @@
-module HCont where
+{-# OPTIONS --cubical --guardedness #-}
 
-open import Level
-open import Data.Empty
-open import Data.Unit
-open import Data.Sum
-open import Data.Product
-open import Function.Base
+module Data.HCont where
 
-{- Kinds & Contexts & Variables -}
+open import Agda.Primitive using (lzero; lsuc)
+open import Prelude
+
+{- Tys & Contexts & Variables -}
 
 infixr 20 _⇒_
-data Kind : Set where
-  * : Kind
-  _⇒_ : Kind → Kind → Kind
+data Ty : Type where
+  * : Ty
+  _⇒_ : Ty → Ty → Ty
 
-variable A B C : Kind
+variable A B C : Ty
 
 infixl 5 _▹_
-data Con : Set where
+data Con : Type where
   •   : Con
-  _▹_ : Con → Kind → Con
+  _▹_ : Con → Ty → Con
 
 variable Γ Δ Θ : Con
 
-data Var : Con → Kind → Set where
+data Var : Con → Ty → Type where
   vz : Var (Γ ▹ A) A
   vs : Var Γ A → Var (Γ ▹ B) A
 
@@ -33,11 +31,11 @@ variable x y : Var Γ A
 
 infixr 4 _,_
 
-data Nf : Con → Kind → Set₁
+data Nf : Con → Ty → Type₁
 
-record Ne (Γ : Con) (B : Kind) : Set₁
+record Ne (Γ : Con) (B : Ty) : Type₁
 
-data Sp : Con → Kind → Kind → Set₁
+data Sp : Con → Ty → Ty → Type₁
 
 data Nf where
   lam : Nf (Γ ▹ A) B → Nf Γ (A ⇒ B)
@@ -49,8 +47,8 @@ record Ne Γ B where
   constructor _◃_◃_
   inductive
   field
-    S : Set
-    P : Var Γ A → S → Set
+    S : Type
+    P : Var Γ A → S → Type
     R : (x : Var Γ A) (s : S) → P x s → Sp Γ A B
 
 variable spr tql : Ne Γ A
@@ -61,9 +59,8 @@ data Sp where
   
 variable ts us ws : Sp Γ A B
 
-HCont : Kind → Set₁
+HCont : Ty → Type₁
 HCont = Nf •
-
 
 ap : Nf Γ (A ⇒ B) → Nf (Γ ▹ A) B
 ap (lam t) = t
@@ -83,7 +80,7 @@ wkv vz y = vs y
 wkv (vs x) vz = vz
 wkv (vs x) (vs y) = vs (wkv x y)
 
-data EqVar : Var Γ A → Var Γ B → Set where
+data EqVar : Var Γ A → Var Γ B → Type where
   same : EqVar x x
   diff : (x : Var Γ A) (y : Var (Γ - x) B) → EqVar x (wkv x y)
 
@@ -108,10 +105,10 @@ wkNf x (ne spr) = ne (wkNe x spr)
 
 wkNe {Γ} {A} {C} x (S ◃ P ◃ R) = S′ ◃ P′ ◃ R′
   where
-  S′ : Set
+  S′ : Type
   S′ = S
   
-  P′ : Var Γ B → S → Set
+  P′ : Var Γ B → S → Type
   P′ y  s with eq x y
   P′ .x s | same = ⊥
   P′ y  s | diff .x y′ = P y′ s
@@ -135,10 +132,10 @@ ne2nf : Ne Γ A → Nf Γ A
 
 nvar {Γ} {B} x = ne2nf (S ◃ P ◃ R)
   where
-  S : Set
+  S : Type
   S = ⊤
 
-  P : Var Γ A → S → Set
+  P : Var Γ A → S → Type
   P y  tt with eq x y
   P .x tt | same = ⊤
   P y  tt | diff .x y′ = ⊥
@@ -151,7 +148,7 @@ nvar {Γ} {B} x = ne2nf (S ◃ P ◃ R)
 ne2nf {Γ} {*} spr = ne spr
 ne2nf {Γ} {A ⇒ C} (S ◃ P ◃ R) = lam (ne2nf (S ◃ P′ ◃ R′))
   where
-  P′ : Var (Γ ▹ A) B → S → Set
+  P′ : Var (Γ ▹ A) B → S → Type
   P′ vz s = ⊥
   P′ (vs x) s = P x s
 
@@ -168,10 +165,10 @@ _<_:=_> : Sp Γ B C → (x : Var Γ A) → Nf (Γ - x) A → Sp (Γ - x) B C
 lam t [ x := u ] = lam (t [ vs x := wkNf vz u ])
 ne {Γ} (S ◃ P ◃ R) [ x := u ] = ne (S′ ◃ P′ ◃ R′)
   where
-  S′ : Set
+  S′ : Type
   S′ = S
   
-  P′ : Var (Γ - x) A → S → Set
+  P′ : Var (Γ - x) A → S → Type
   P′ y s = P (wkv x y) s
   
   R′ : (y : Var (Γ - x) A) (s : S) → P′ y s → Sp (Γ - x) A *
@@ -201,74 +198,74 @@ _×nf_ : Nf Γ A → Nf Γ A → Nf Γ A
 lam t ×nf lam u = lam (t ×nf u)
 _×nf_ {Γ} {B} (ne (S ◃ P ◃ R)) (ne (T ◃ Q ◃ L)) = ne (S′ ◃ P′ ◃ R′)
   where
-  S′ : Set
+  S′ : Type
   S′ = S × T
 
-  P′ : Var Γ A → S′ → Set
+  P′ : Var Γ A → S′ → Type
   P′ x (s , t) = P x s ⊎ Q x t
 
   R′ : (x : Var Γ A) (s : S′) → P′ x s → Sp Γ A B
-  R′ x (s , t) (inj₁ p) = R x s p
-  R′ x (s , t) (inj₂ q) = L x t q
+  R′ x (s , t) (inl p) = R x s p
+  R′ x (s , t) (inr q) = L x t q
 
 _⊎nf_ : Nf Γ A → Nf Γ A → Nf Γ A
 lam t ⊎nf lam u = lam (t ⊎nf u)
 _⊎nf_ {Γ} {B} (ne (S ◃ P ◃ R)) (ne (T ◃ Q ◃ L)) = ne (S′ ◃ P′ ◃ R′)
   where
-  S′ : Set
+  S′ : Type
   S′ = S ⊎ T
 
-  P′ : Var Γ A → S′ → Set
-  P′ x (inj₁ s) = P x s
-  P′ x (inj₂ t) = Q x t
+  P′ : Var Γ A → S′ → Type
+  P′ x (inl s) = P x s
+  P′ x (inr t) = Q x t
 
   R′ : (x : Var Γ A) (s : S′) → P′ x s → Sp Γ A B
-  R′ x (inj₁ s) p = R x s p
-  R′ x (inj₂ t) q = L x t q
+  R′ x (inl s) p = R x s p
+  R′ x (inr t) q = L x t q
 
-Πnf : (I : Set) → (I → Nf Γ A) → Nf Γ A
+Πnf : (I : Type) → (I → Nf Γ A) → Nf Γ A
 Πnf {Γ} {A ⇒ B} I ts = lam (Πnf I (λ i → ap (ts i)))
 Πnf {Γ} {*} I ts = ne (S ◃ P ◃ R)
   where
-  S : Set
+  S : Type
   S = (i : I) → en (ts i) .Ne.S
 
-  P : Var Γ A → S → Set
+  P : Var Γ A → S → Type
   P x f = Σ[ i ∈ I ] en (ts i) .Ne.P x (f i)
 
   R : (x : Var Γ A) (s : S) → P x s → Sp Γ A *
   R x f (i , p) = en (ts i) .Ne.R x (f i) p
 
-Σnf : (I : Set) → (I → Nf Γ A) → Nf Γ A
+Σnf : (I : Type) → (I → Nf Γ A) → Nf Γ A
 Σnf {Γ} {A ⇒ B} I ts = lam (Σnf I (λ i → ap (ts i)))
 Σnf {Γ} {*} I ts = ne (S ◃ P ◃ R)
   where
-  S : Set
+  S : Type
   S = Σ[ i ∈ I ] en (ts i) .Ne.S
 
-  P : Var Γ A → S → Set
+  P : Var Γ A → S → Type
   P x (i , s) = en (ts i) .Ne.P x s
 
   R : (x : Var Γ A) (s : S) → P x s → Sp Γ A *
   R x (i , s) p = en (ts i) .Ne.R x s p
 
 infix 2 Σnf-syntax
-Σnf-syntax : (I : Set) → (I → Nf Γ A) → Nf Γ A
+Σnf-syntax : (I : Type) → (I → Nf Γ A) → Nf Γ A
 Σnf-syntax = Πnf
 syntax Σnf-syntax A (λ x → B) = Σnf[ x ∈ A ] B
 
 infix 2 Πnf-syntax
-Πnf-syntax : (I : Set) → (I → Nf Γ A) → Nf Γ A
+Πnf-syntax : (I : Type) → (I → Nf Γ A) → Nf Γ A
 Πnf-syntax = Πnf
 syntax Πnf-syntax A (λ x → B) = Πnf[ x ∈ A ] B
 
 {- Morphisms -}
 
-data NfHom : (Γ : Con) → Nf Γ A → Nf Γ A → Set₁
+data NfHom : (Γ : Con) → Nf Γ A → Nf Γ A → Type₁
 
-record NeHom Γ {B} (spr tql : Ne Γ B) : Set₁
+record NeHom Γ {B} (spr tql : Ne Γ B) : Type₁
 
-data SpHom : (Γ : Con) → Sp Γ A B → Sp Γ A B → Set₁
+data SpHom : (Γ : Con) → Sp Γ A B → Sp Γ A B → Type₁
 
 data NfHom where
   lam : NfHom (Γ ▹ A) t u → NfHom Γ (lam t) (lam u)
@@ -289,7 +286,7 @@ data SpHom where
   ε   : SpHom Γ ts ts
   _,_ : NfHom Γ t u → SpHom Γ ts us → SpHom Γ (t , ts) (u , us)
 
-HContHom : HCont A → HCont A → Set₁
+HContHom : HCont A → HCont A → Type₁
 HContHom = NfHom •
 
 idNfHom : NfHom Γ t t
@@ -347,19 +344,19 @@ _<_:=_>Hom : SpHom Γ ts us → (x : Var Γ A) (w : Nf (Γ - x) A) → SpHom (Γ
 (lam f) [ x := w ]Hom = lam (f [ vs x := wkNf vz w ]Hom)
 ne {Γ} {S ◃ P ◃ R} {T ◃ Q ◃ L} (f ◃ g ◃ h) [ x := w ]Hom = ne (f′ ◃ g′ ◃ h′)
   where
-  S′ : Set
+  S′ : Type
   S′ = S
 
-  P′ : Var (Γ - x) A → S → Set
+  P′ : Var (Γ - x) A → S → Type
   P′ y s = P (wkv x y) s
 
   R′ : (y : Var (Γ - x) A) (s : S) → P′ y s → Sp (Γ - x) A *
   R′ y s p = R (wkv x y) s p < x := w >
 
-  T′ : Set
+  T′ : Type
   T′ = T
 
-  Q′ : Var (Γ - x) A → T → Set
+  Q′ : Var (Γ - x) A → T → Type
   Q′ y t = Q (wkv x y) t
 
   L′ : (y : Var (Γ - x) A) (t : T) → Q′ y t → Sp (Γ - x) A *
@@ -397,7 +394,7 @@ ne {Γ} {S ◃ P ◃ R} {T ◃ Q ◃ L} (f ◃ g ◃ h) [ x := w ]Hom = ne (f′
   f (s , t) = s
 
   g : (x : Var Γ A) (st : S × T) → P x (f st) → P x (st .proj₁) ⊎ Q x (st .proj₂)
-  g x (s , t) p = inj₁ p
+  g x (s , t) p = inl p
 
   h : (x : Var Γ A) (st : S × T) (q : P x (f st)) → SpHom Γ (R x (f st) q) (R x (f st) q)
   h x (s , t) q = ε
@@ -407,7 +404,7 @@ i₁nf (lam t) (lam u) = lam (i₁nf t u)
 i₁nf {Γ} (ne (S ◃ P ◃ R)) (ne (T ◃ Q ◃ L)) = ne (f ◃ g ◃ h)
   where
   f : S → S ⊎ T
-  f s = inj₁ s
+  f s = inl s
 
   g : (x : Var Γ A) (s : S) → P x s → P x s
   g x s p = p
@@ -423,12 +420,12 @@ i₁nf {Γ} (ne (S ◃ P ◃ R)) (ne (T ◃ Q ◃ L)) = ne (f ◃ g ◃ h)
   ff = < f₁ , f₂ >
 
   gg : (x : Var Γ A) (s : _) → _
-  gg x s (inj₁ q₁) = g₁ x s q₁
-  gg x s (inj₂ q₂) = g₂ x s q₂
+  gg x s (inl q₁) = g₁ x s q₁
+  gg x s (inr q₂) = g₂ x s q₂
 
   hh : (x : Var Γ A) (s : _) (q : _) → _
-  hh x s (inj₁ q₁) = h₁ x s q₁
-  hh x s (inj₂ q₂) = h₂ x s q₂
+  hh x s (inl q₁) = h₁ x s q₁
+  hh x s (inr q₂) = h₂ x s q₂
 
 [_,_]nf : NfHom Γ t w → NfHom Γ u w → NfHom Γ (t ⊎nf u) w
 [ lam tv , lam uv ]nf = lam [ tv , uv ]nf
@@ -438,24 +435,24 @@ i₁nf {Γ} (ne (S ◃ P ◃ R)) (ne (T ◃ Q ◃ L)) = ne (f ◃ g ◃ h)
   ff = [ f₁ , f₂ ]
 
   gg : (x : Var Γ A) (s : _) → _
-  gg x (inj₁ s₁) q₁ = g₁ x s₁ q₁
-  gg x (inj₂ s₂) q₂ = g₂ x s₂ q₂
+  gg x (inl s₁) q₁ = g₁ x s₁ q₁
+  gg x (inr s₂) q₂ = g₂ x s₂ q₂
 
   hh : (x : Var Γ A) (s : _) (q : _) → _
-  hh x (inj₁ s₁) q₁ = h₁ x s₁ q₁
-  hh x (inj₂ s₂) q₂ = h₂ x s₂ q₂
+  hh x (inl s₁) q₁ = h₁ x s₁ q₁
+  hh x (inr s₂) q₂ = h₂ x s₂ q₂
 -}
 
 {- Semantics -}
 
 {- One Interpreation -}
 
-⟦_⟧k : Kind → Set₁
-⟦ * ⟧k = Set
+⟦_⟧k : Ty → Type₁
+⟦ * ⟧k = Type
 ⟦ A ⇒ B ⟧k = ⟦ A ⟧k → ⟦ B ⟧k
 
-⟦_⟧c : Con → Set₁
-⟦ • ⟧c = Lift (suc zero) ⊤
+⟦_⟧c : Con → Type₁
+⟦ • ⟧c = Lift (lsuc lzero) ⊤
 ⟦ Γ ▹ A ⟧c = ⟦ Γ ⟧c × ⟦ A ⟧k
 
 ⟦_⟧v : Var Γ A → ⟦ Γ ⟧c → ⟦ A ⟧k
@@ -464,7 +461,7 @@ i₁nf {Γ} (ne (S ◃ P ◃ R)) (ne (T ◃ Q ◃ L)) = ne (f ◃ g ◃ h)
 
 ⟦_⟧nf : Nf Γ A → ⟦ Γ ⟧c → ⟦ A ⟧k
 
-⟦_⟧ne : Ne Γ * → ⟦ Γ ⟧c → Set
+⟦_⟧ne : Ne Γ * → ⟦ Γ ⟧c → Type
 
 ⟦_⟧sp : Sp Γ A B → ⟦ Γ ⟧c → ⟦ A ⟧k → ⟦ B ⟧k
 
@@ -472,7 +469,7 @@ i₁nf {Γ} (ne (S ◃ P ◃ R)) (ne (T ◃ Q ◃ L)) = ne (f ◃ g ◃ h)
 ⟦ ne spr ⟧nf as = ⟦ spr ⟧ne as
 
 ⟦_⟧ne {Γ} (S ◃ P ◃ R) as =
-  Σ[ s ∈ S ] ({A : Kind} (x : Var Γ A) (p : P x s)
+  Σ[ s ∈ S ] ({A : Ty} (x : Var Γ A) (p : P x s)
   → ⟦ R x s p ⟧sp as (⟦ x ⟧v as))
 
 ⟦ ε ⟧sp as a = a
@@ -483,16 +480,16 @@ i₁nf {Γ} (ne (S ◃ P ◃ R)) (ne (T ◃ Q ◃ L)) = ne (f ◃ g ◃ h)
 
 {- Λ Terms -}
 
-data Ty : Con → Kind → Set₁ where
-  var : Var Γ A → Ty Γ A
-  lam : Ty (Γ ▹ A) B → Ty Γ (A ⇒ B)
-  app : Ty Γ (A ⇒ B) → Ty Γ A → Ty Γ B
-  Πᶜ : (I : Set) → (I → Ty Γ A) → Ty Γ A
-  Σᶜ : (I : Set) → (I → Ty Γ A) → Ty Γ A
+data Tm : Con → Ty → Type₁ where
+  var : Var Γ A → Tm Γ A
+  lam : Tm (Γ ▹ A) B → Tm Γ (A ⇒ B)
+  app : Tm Γ (A ⇒ B) → Tm Γ A → Tm Γ B
+  Πᶜ : (I : Type) → (I → Tm Γ A) → Tm Γ A
+  Σᶜ : (I : Type) → (I → Tm Γ A) → Tm Γ A
 
 {- Normalization -}
 
-nf : Ty Γ A → Nf Γ A
+nf : Tm Γ A → Nf Γ A
 nf (var x) = nvar x
 nf (lam t) = lam (nf t)
 nf (app t u) = napp (nf t) (nf u)
@@ -501,9 +498,9 @@ nf (Σᶜ I f) = Σnf I (nf ∘ f)
 
 {- Embedding -}
 
-emb : Nf Γ A → Ty Γ A
+emb : Nf Γ A → Tm Γ A
 
-embSp : Sp Γ A B → Ty Γ A → Ty Γ B
+embSp : Sp Γ A B → Tm Γ A → Tm Γ B
 
 emb (lam t) = lam (emb t)
 emb {Γ} {A} (ne (S ◃ P ◃ R))

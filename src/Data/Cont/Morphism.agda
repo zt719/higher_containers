@@ -1,4 +1,4 @@
-{-# OPTIONS --cubical --guardedness #-}
+{-# OPTIONS --cubical #-}
 
 module Data.Cont.Morphism where
 

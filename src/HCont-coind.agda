@@ -3,8 +3,6 @@ module HCont-coind where
 
 open import Agda.Primitive
   using (Level ; lzero ; lsuc ; _⊔_)
-  renaming (Set to Type ; Setω to Typeω)
-
 
 record ∑ {i j} (A : Type i) (B : A → Type j) : Type (i ⊔ j) where
   constructor _,_

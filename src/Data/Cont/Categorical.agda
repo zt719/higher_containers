@@ -1,4 +1,4 @@
-{-# OPTIONS --cubical --guardedness #-}
+{-# OPTIONS --cubical #-}
 
 module Data.Cont.Categorical where
 
@@ -199,10 +199,6 @@ _⊚ᶜ₁_ : SP →ᶜ TQ → SP' →ᶜ TQ' → SP ⊚ᶜ SP' →ᶜ TQ ⊚ᶜ
 
 -- Finitary compositions
 
-open import Cubical.Data.Nat
-open import Cubical.Data.Fin
-
-{-
 Fin⊚ᶜ : {n : ℕ} → (Fin n → Cont) → Cont
 Fin⊚ᶜ f = Fin⊚ᶜS f ◃ Fin⊚ᶜP f
   where
@@ -210,9 +206,8 @@ Fin⊚ᶜ f = Fin⊚ᶜS f ◃ Fin⊚ᶜP f
   Fin⊚ᶜS {zero} f = ⊤
   Fin⊚ᶜS {suc n} f with f zero
   ... | S ◃ P = Σ[ s ∈ S ] (P s → Fin⊚ᶜS {n} (f ∘ suc))
-
+  
   Fin⊚ᶜP : {n : ℕ} (f : Fin n → Cont) → Fin⊚ᶜS {n} f → Type
   Fin⊚ᶜP {zero} f tt = ⊤
   Fin⊚ᶜP {suc n} f (s , g) with f zero
   ... | S ◃ P = Σ[ p ∈ P s ] Fin⊚ᶜP {n} (f ∘ suc) (g p)
--}

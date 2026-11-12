@@ -1,17 +1,17 @@
 {- Fω -}
 
-data Kind : Set where
+data Kind : Type where
   * : Kind
   _⇒_ : Kind → Kind → Kind
 
-data ConK : Set where
+data ConK : Type where
   • : ConK
   _▷_ : ConK → Kind → ConK
 
 variable κ κ' : Kind
 variable Θ Θ' : ConK
 
-data Ty : ConK → Kind → Set where
+data Ty : ConK → Kind → Type where
   zero : Ty (Θ ▷ κ) κ
   suc : Ty Θ κ → Ty (Θ ▷ κ') κ
   lam : Ty (Θ ▷ κ) κ' → Ty Θ (κ ⇒ κ')
@@ -21,7 +21,7 @@ data Ty : ConK → Kind → Set where
   sucT : Ty Θ * → (κ : Kind) → Ty (Θ ▷ κ) *
   _[_]T : Ty (Θ ▷ κ) * → Ty Θ κ → Ty Θ *
 
-data ConT (Θ : ConK) : Set where
+data ConT (Θ : ConK) : Type where
   • : ConT Θ
   _▷_ : ConT Θ → Ty Θ * → ConT Θ
 
@@ -32,7 +32,7 @@ sucT* : ConT Θ → (κ : Kind) → ConT (Θ ▷ κ)
 sucT* • κ = •
 sucT* (Γ ▷ σ) κ = sucT* Γ κ ▷ sucT σ κ
 
-data Tm : (Θ : ConK) → ConT Θ → Ty Θ * → Set where
+data Tm : (Θ : ConK) → ConT Θ → Ty Θ * → Type where
   zero : Tm Θ (Δ ▷ σ) σ
   suc : Tm Θ Δ σ → Tm Θ (Δ ▷ τ) σ
   lam : Tm Θ (Δ ▷ σ) τ → Tm Θ Δ (σ ⇨ τ)

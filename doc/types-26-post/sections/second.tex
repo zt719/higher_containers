@@ -1,93 +1,259 @@
 \section{Second-Order}
 
-In this section, we start with a concrete problem, then introduce second-order containers with interpretation, then the category of second-order containers, then second-order W-type to fix the problem.
+In this section, we begin by examining the nested datatype
+\AgdaDatatype{Bush} as a motivating example, and work out its semantics by
+constructing an explicit container representation. We then generalise this
+example to an arbitrary second-order setting, introducing second-order
+containers and second-order W-types (and M-types).
 
-\paragraph*{Bush Problem}
+\paragraph*{Nested Datatypes}
 
-From indexed type to higher-order type:
+One motivation for nested datatypes is the representation of function types as
+terminal coalgebras, that is, as coinductive types. A well-known instance is
+\AgdaDatatype{ℕ}\AgdaSpace{}%
+\AgdaSymbol{→}\AgdaSpace{}%
+\AgdaBound{X}\AgdaSpace{}%
+\AgdaFunction{≃}\AgdaSpace{}%
+\AgdaRecord{Stream}\AgdaSpace{}%
+\AgdaBound{X}\AgdaSpace{}%
+, where
+\AgdaRecord{Stream}\AgdaSpace{}%
+\AgdaBound{X}\AgdaSpace{}%
+is defined coinductively by
+\AgdaBound{X}\AgdaSpace{}%
+\AgdaFunction{×}\AgdaSpace{}%
+\AgdaRecord{Stream}\AgdaSpace{}%
+\AgdaBound{X}%
+. Now consider binary trees carrying no data at either leaves or nodes:
 
-How to understand the \AgdaDatatype{Bush} as example:
+\input{code/BTree}
 
-\input{code/Bush}
+What is the corresponding coalgebraic representation of
+\AgdaDatatype{BTree}\AgdaSpace{}%
+\AgdaSymbol{→}\AgdaSpace{}%
+\AgdaBound{X}\AgdaSpace{}%
+? It is given by the following type:
 
-If we naively encode this using indexed type:
+\input{code/cobush}
 
-\input{code/IndexedBush}
+The destructor \AgdaField{tail} involves a double application of
+\AgdaRecord{Bush∞}. In fact, nesting of arbitrary finite depth is required: one
+can show that the function type out of $n$-ary branching trees
+\AgdaDatatype{NTree}\AgdaSpace{}%
+\AgdaSymbol{→}\AgdaSpace{}%
+\AgdaBound{X}\AgdaSpace{}%
+corresponds to a terminal coalgebra \AgdaRecord{Bushⁿ∞} whose destructor
+\AgdaField{tail} applies \AgdaRecord{Bushⁿ∞} $n$ times.
 
-The constructors \AgdaDatatype{nil} and \AgdaDatatype{cons} force it to be large type because they contains small universe \AgdaPrimitive{Type}. There are two issues here: there is a size issue in \AgdaDatatype{Bush (Bush X)}; there is a no positivity issue in \AgdaDatatype{Bush (Bush X)} because Agda cannot see it is algebraic.
+\paragraph*{Bush as initial algebra}
+
+For simplicity and intuition, however, we first consider an inhabited,
+inductive variant of \AgdaRecord{Bush∞}:
+
+\input{code/bush}
+
+This type closely resembles \AgdaDatatype{List}, except for the nested
+application in \AgdaInductiveConstructor{\_∷\_}. Whereas the signature of
+\AgdaDatatype{List}
+\AgdaSpace{}\AgdaBound{A} can be presented as
+\AgdaBound{X}\AgdaSpace{}%
+\AgdaSymbol{↦}\AgdaSpace{}%
+\AgdaRecord{⊤}\AgdaSpace{}%
+\AgdaDatatype{⊎}\AgdaSpace{}%
+\AgdaBound{A}\AgdaSpace{}%
+\AgdaFunction{×}\AgdaSpace{}%
+\AgdaBound{X}\AgdaSpace{}%
+, the signature of \AgdaDatatype{Bush}\AgdaSpace{}\AgdaBound{A} cannot be
+brought into the same form
+\AgdaBound{X}\AgdaSpace{}%
+\AgdaSymbol{↦}\AgdaSpace{}%
+\AgdaRecord{⊤}\AgdaSpace{}%
+\AgdaDatatype{⊎}\AgdaSpace{}%
+\AgdaBound{A}\AgdaSpace{}%
+\AgdaFunction{×}\AgdaSpace{}%
+\AgdaBound{?}\AgdaSpace{}%
+since there is no type that can be placed in the hole \AgdaBound{?} to express
+the double application.
+
+Our solution is to lift the setting to second order: instead of algebras in the
+category \AgdaPrimitive{Type}, we consider algebras in the category
+\AgdaRecord{Cont}. At the level of types, a second-order signature for
+\AgdaDatatype{Bush} is given by:
+
+\input{code/bushsig}
+
+This signature abstracts over a type-constructor variable \AgdaBound{F}. If we
+restrict \AgdaBound{F} to be strictly positive, that is, representable by a
+container, the signature can be expressed at the level of containers:
+
+\input{code/bushsigcont}
+
+This mapping is an endofunctor on containers. We now construct a container
+representation of \AgdaDatatype{Bush}. Suppose that
+\AgdaFunction{Bushᶜ}\AgdaSpace{}%
+\AgdaSymbol{=}\AgdaSpace{}%
+\AgdaRecord{S}\AgdaSpace{}%
+\AgdaInductiveConstructor{◃}\AgdaSpace{}%
+\AgdaRecord{P}\AgdaSpace{}%
+is the initial algebra of \AgdaFunction{SigBushᶜ}. The construction is guided
+by the following calculation:
+
+\[
+\begin{array}{cl}
+  & \AgdaRecord{S}\;\AgdaInductiveConstructor{◃}\;\AgdaRecord{P} \\
+  & \quad \{\ \text{by assumption} \} \\
+≃ & \AgdaFunction{SigBushᶜ}\;(\AgdaRecord{S}\;\AgdaInductiveConstructor{◃}\;\AgdaRecord{P}) \\
+  & \quad \{\ \text{by definition of \AgdaFunction{SigBushᶜ}}\ \} \\
+≃ & \AgdaFunction{⊤ᶜ}\;\AgdaFunction{⊎ᶜ}\;(\AgdaFunction{1ᶜ}\;\AgdaFunction{×ᶜ}\;(\AgdaRecord{S}\;\AgdaInductiveConstructor{◃}\;\AgdaRecord{P})\;\AgdaOperator{\AgdaFunction{⊗ᶜ}}\;(\AgdaRecord{S}\;\AgdaInductiveConstructor{◃}\;\AgdaRecord{P})) \\
+  & \quad \{\ \text{by definition of \AgdaOperator{\AgdaFunction{⊗ᶜ}}}\ \} \\
+≃ & \AgdaFunction{⊤ᶜ}\;\AgdaFunction{⊎ᶜ}\;(\AgdaFunction{1ᶜ}\;\AgdaFunction{×ᶜ}\;(\AgdaFunction{Σ}\,[\,\AgdaBound{s}\in\AgdaRecord{S}\,]\;(\AgdaRecord{P}\;\AgdaBound{s}\to\AgdaRecord{S})
+    \;\AgdaInductiveConstructor{◃}\;
+    λ\,(\AgdaBound{s}\,,\AgdaBound{f})\to\AgdaFunction{Σ}\,[\,\AgdaBound{p}\in\AgdaRecord{P}\;\AgdaBound{s}\,]\;\AgdaRecord{P}\,(\AgdaBound{f}\;\AgdaBound{p}))) \\
+  & \quad \{\ \text{by definition of \AgdaFunction{1ᶜ} and \AgdaFunction{×ᶜ}}\ \} \\
+≃ & \AgdaFunction{⊤ᶜ}\;\AgdaFunction{⊎ᶜ}\;(\AgdaFunction{Σ}\,[\,\AgdaBound{s}\in\AgdaRecord{S}\,]\;(\AgdaRecord{P}\;\AgdaBound{s}\to\AgdaRecord{S})
+    \;\AgdaInductiveConstructor{◃}\;
+    λ\,(\AgdaBound{s}\,,\AgdaBound{f})\to\AgdaDatatype{⊤}\;\AgdaDatatype{⊎}\;\AgdaFunction{Σ}\,[\,\AgdaBound{p}\in\AgdaRecord{P}\;\AgdaBound{s}\,]\;\AgdaRecord{P}\,(\AgdaBound{f}\;\AgdaBound{p})) \\
+  & \quad \{\ \text{by definition of \AgdaFunction{⊤ᶜ} and \AgdaFunction{⊎ᶜ}}\ \} \\
+≃ & \AgdaDatatype{⊤}\;\AgdaDatatype{⊎}\;\AgdaFunction{Σ}\,[\,\AgdaBound{s}\in\AgdaRecord{S}\,]\;(\AgdaRecord{P}\;\AgdaBound{s}\to\AgdaRecord{S})
+    \;\AgdaInductiveConstructor{◃}\;
+    \AgdaFunction{case}\;(λ\,\AgdaInductiveConstructor{tt}\to\AgdaDatatype{⊥})\;
+    (λ\,(\AgdaBound{s}\,,\AgdaBound{f})\to\AgdaDatatype{⊤}\;\AgdaDatatype{⊎}\;\AgdaFunction{Σ}\,[\,\AgdaBound{p}\in\AgdaRecord{P}\;\AgdaBound{s}\,]\;\AgdaRecord{P}\,(\AgdaBound{f}\;\AgdaBound{p}))
+\end{array}
+\]
+
+where \AgdaFunction{case} is the universal map out of a coproduct:
+
+\input{code/case}
+
+Reading off the solution of this equation, we define the shapes and positions
+mutually by induction-induction:
+
+\input{code/bushcont}
+
+The shape \AgdaRecord{S} is inductive because we are constructing an initial
+algebra; to obtain the terminal coalgebra, it suffices to make it coinductive
+instead. The position \AgdaRecord{P}, however, should be always inductive, since
+positions must be finite: you only provide finite terms to a constructor or a
+field.
+
+We prove that \AgdaFunction{Bushᶜ} is indeed the initial algebra of
+\AgdaFunction{SigBushᶜ}; the proof can be found in our formalisation.
 
 \paragraph*{Second-Order Containers}
 
-We need a new way to understand this. We introduce second-order containers
+The example above generalises to arbitrary second-order polynomial functors. By
+a second-order polynomial we mean a polynomial in both a variable $x$ and a
+function variable $f$, for instance $h (f , x) = 1 + x * f (f x)$. We therefore
+introduce the following syntax for second-order containers:
 
-\input{code/2Cont}
+\input{code/2cont}
 
-There is a function interpretation:
+The syntax is analogous to the first-order case. \AgdaField{S} indexes the
+monomials, while \AgdaField{PX} and \AgdaField{PF} give the exponents of the
+variable $x$ and of the function variable $f$, respectively. The interesting
+component is \AgdaField{RF}, which inductively describes the inner polynomial
+under each application of $f$.
 
-\input{code/2Func}
+Second-order containers are equipped with a type-level semantics, which decodes
+the syntax into the corresponding polynomial; it corresponds to
+\AgdaFunction{SigBush} in our example.
 
+\input{code/2func}
 
-There is a categorical interpretation
+Categorically, a second-order container gives rise to an endofunctor on
+containers; this corresponds to \AgdaFunction{SigBushᶜ} in our example.
 
 \input{code/2app}
 
-The definition is derived by solving the following equation:
+Observe that the codomain of \AgdaFunction{app} is \AgdaRecord{Cont}, which is
+essentially a \AgdaRecord{Σ}-type of shapes and positions. Any construction with
+codomain \AgdaRecord{Cont} naturally splits into a shape part and a position
+part, as with \AgdaFunction{appS} and \AgdaFunction{appP}. The definition of
+\AgdaFunction{app} is derived by solving the following equation:
 
-\[ 2⟦ H ⟧ ⟦ F ⟧ X ≃ ⟦ app H F ⟧ X \]
-
-\AgdaFunction{app}\AgdaSpace{}\AgdaBound{H} is an endofunctor of category of \AgdaRecord{Cont}. We omit the functorial action \AgdaFunction{app₁}.
-
-\paragraph*{The category of second-order containers}
-
-We present the morphisms of second-order containers:
-
-\begin{code}
-Some code here
-\end{code}
-
-They form a wild category. It has all infinitary products and coproducts, constructed pointwisely on shape.
+\[ \AgdaOperator{\AgdaFunction{2⟦}}\;\AgdaBound{H}\;\AgdaOperator{\AgdaFunction{⟧}}\;
+   \AgdaOperator{\AgdaFunction{⟦}}\;\AgdaBound{F}\;\AgdaOperator{\AgdaFunction{⟧}}\;\AgdaBound{X}
+   \;\AgdaFunction{≃}\;
+   \AgdaOperator{\AgdaFunction{⟦}}\;\AgdaFunction{app}\;\AgdaBound{H}\;\AgdaBound{F}\;\AgdaOperator{\AgdaFunction{⟧}}\;\AgdaBound{X} \]
 
 \paragraph*{Second-Order W-type}
 
-We want to calculate the least algebras of second-order container functors. That is we want to have ... :
+Does every second-order container have an initial algebra? We answer this
+question positively by constructing \emph{second-order W-types}. Given a
+second-order container \AgdaBound{H} and an \AgdaBound{H}-algebra
+\AgdaSymbol{(}\AgdaBound{F}\AgdaSymbol{,}\AgdaBound{α}\AgdaSymbol{)}, we require
+a unique \AgdaFunction{fold2W} making the following diagram commute:
 
 \[
-\begin{tikzcd}[column sep=large, row sep=large]
-  \mathsf{app}\,\mathsf{H}\,(\mathsf{2W}\,\mathsf{H})
-    \arrow[r, "\mathsf{app₁}\,\mathsf{H}\,(\mathsf{2fold}\,\alpha)"]
-    \arrow[d, "{2sup}"'] &
-  \mathsf{app₁}\,\mathsf{H}\,F
-    \arrow[d, "\alpha"] \\
-  \mathsf{2W}\,\mathsf{H}
-    \arrow[r, dashed, "\mathsf{2fold}\,\alpha"'] &
-  F
+\begin{tikzcd}[column sep=8em, row sep=large]
+  \AgdaFunction{app}\;\AgdaBound{H}\;(\AgdaFunction{2W}\;\AgdaBound{H})
+    \arrow[r, "{\AgdaFunction{app₁}\;\AgdaBound{H}\;(\AgdaFunction{fold2W}\;\AgdaBound{α})}"]
+    \arrow[d, "{\AgdaFunction{2sup}}"'] &
+  \AgdaFunction{app₁}\;\AgdaBound{H}\;\AgdaBound{F}
+    \arrow[d, "{\AgdaBound{α}}"] \\
+  \AgdaFunction{2W}\;\AgdaBound{H}
+    \arrow[r, dashed, "{\AgdaFunction{fold2W}\;\AgdaBound{α}}"'] &
+  \AgdaBound{F}
 \end{tikzcd}
 \]
 
-It follows:
+We first construct \AgdaFunction{2W}, which must be a fixed point of
+\AgdaFunction{app}\AgdaSpace{}\AgdaBound{H}:
 
-\[ 2W H ≃ app H (2W H) \]
+\[ \AgdaFunction{2W}\;\AgdaBound{H}\;\AgdaFunction{≃}\;\AgdaFunction{app}\;\AgdaBound{H}\;(\AgdaFunction{2W}\;\AgdaBound{H}) \]
 
-We actually need to generalised the equation to:
+Splitting this explicitly into shapes and positions yields:
 
-\[ 2W-d H' H ≃ app H' (2W-d H' H) \]
+\[ \AgdaDatatype{2WS}\;\AgdaBound{H}\;\AgdaOperator{\AgdaInductiveConstructor{◃}}\;\AgdaDatatype{2WP}\;\AgdaBound{H}\;\AgdaFunction{≃}\;\AgdaFunction{appS}\;\AgdaBound{H}\;(\AgdaFunction{2W}\;\AgdaBound{H})\;\AgdaOperator{\AgdaInductiveConstructor{◃}}\;\AgdaFunction{appP}\;\AgdaBound{H}\;(\AgdaFunction{2W}\;\AgdaBound{H}) \]
 
-because ...
+Following the \AgdaDatatype{Bush} example, we again attempt a definition by
+induction-induction:
 
-We construct 2W by inductive-induction. It is constructed by splitting the domain \AgdaRecord{Cont} into \AgdaPrimitive{S : Type} and \AgdaPrimitive{P : S → Type}. 
+\input{code/bad2w}
 
-\input{code/2W-d}
+However, Agda rejects both \AgdaDatatype{2WS} and \AgdaDatatype{2WP} as not
+strictly positive, even though they are morally strictly positive. This is
+because \AgdaFunction{appS} and \AgdaFunction{appP} are defined by recursion,
+and Agda cannot unfold such recursive definitions when checking strict
+positivity. Our solution is to generalise the original equation to:
 
-Then 2W is just a special case:
+\[ \AgdaFunction{2W-d}\;\AgdaBound{H'}\;\AgdaBound{H}\;\AgdaFunction{≃}\;\AgdaFunction{app}\;\AgdaBound{H'}\;(\AgdaFunction{2W-d}\;\AgdaBound{H'}\;\AgdaBound{H}) \]
 
-\input{code/2W}
+Splitting again into shapes and positions:
 
-Then we can define some morphisms from the diagram:
+\[ \AgdaRecord{2WS-d}\;\AgdaBound{H'}\;\AgdaBound{H}\;\AgdaOperator{\AgdaInductiveConstructor{◃}}\;\AgdaDatatype{2WP-d}\;\AgdaBound{H'}\;\AgdaBound{H}\;\AgdaFunction{≃}\;\AgdaFunction{appS}\;\AgdaBound{H'}\;(\AgdaFunction{2W-d}\;\AgdaBound{H'}\;\AgdaBound{H})\;\AgdaOperator{\AgdaInductiveConstructor{◃}}\;\AgdaFunction{appP}\;\AgdaBound{H'}\;(\AgdaFunction{2W-d}\;\AgdaBound{H'}\;\AgdaBound{H}) \]
 
-\input{code/2WSupFold}
+This equation can now be turned into a well-typed definition by
+induction-induction:
 
-We can show that digram commutes and \AgdaFunction{fold2W} is unique.
+\input{code/2w-d}
+
+This diagonalisation trick works for the following reason. On shapes, the
+inductive definition of \AgdaRecord{2WS-d} internalises the recursive
+definition of \AgdaFunction{appS} by performing induction over \AgdaBound{H'}.
+We must keep a separate copy of \AgdaBound{H}, since \AgdaFunction{2W}\;
+\AgdaBound{H}, which is the special case \AgdaFunction{2W-d}\;\AgdaBound{H}\;
+\AgdaBound{H}, must remain fixed throughout the induction. This approach
+eliminates the explicit use of \AgdaFunction{appS}, so the definition passes the
+strict positivity check while remaining correct. The same reasoning applies to
+positions.
+
+Finally, \AgdaFunction{2W} is recovered by instantiating both arguments to
+\AgdaBound{H} and recombining the shape and position parts:
+
+\input{code/2w}
+
+It remains to construct the remaining components of the diagram. Concretely,
+we define \AgdaFunction{2sup}, the algebra structure on \AgdaFunction{2W};
+\AgdaFunction{fold2W}, the second-order folding function;
+\AgdaFunction{commute2W}, which shows that the diagram commutes;
+and \AgdaFunction{uniquefold2W}, which proves the uniqueness of the fold.
+
+Dually, we define the type \AgdaFunction{2M} by coinduction-induction and prove
+that it is the terminal coalgebra in the second-order setting. The construction
+is almost identical, except that corecursive definitions must be guarded. We
+omit these proofs from the paper.
 
 \paragraph*{Bush as 2W-type}
 
-Now we are ready to construct \AgdaDatatype{Bush}. We define \AgdaFunction{Hᶜ : 2Cont}, where its interpretation is \AgdaFunction{2⟦ Hᶜ ⟧ F X ≃ ⊤ ⊎ X × F (F X)}. The container representation \AgdaFunction{Bushᶜ} can be derived by applying \AgdaFunction{2W} on \AgdaFunction{Hᶜ}. Finally, the original \AgdaDatatype{Bush} is just the extension functor \AgdaFunction{⟦ Bushᶜ ⟧}.
+TODO: Maybe do this?

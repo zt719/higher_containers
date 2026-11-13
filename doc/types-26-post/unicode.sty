@@ -4,6 +4,7 @@
 \RequirePackage{amssymb}
 \RequirePackage{stmaryrd}
 \RequirePackage{newunicodechar}
+\RequirePackage{dsfont}
 
 % ---------- Greek ----------
 \newunicodechar{α}{\ensuremath{\alpha}}
@@ -18,7 +19,10 @@
 \newunicodechar{ϑ}{\ensuremath{\vartheta}}
 \newunicodechar{ι}{\ensuremath{\iota}}
 \newunicodechar{κ}{\ensuremath{\kappa}}
+\newunicodechar{ϰ}{\ensuremath{\varkappa}}
+\newunicodechar{λ}{\ensuremath{\lambda}}
 \newunicodechar{μ}{\ensuremath{\mu}}
+\newunicodechar{µ}{\ensuremath{\mu}} % U+00B5 MICRO SIGN, often typed instead of μ
 \newunicodechar{ν}{\ensuremath{\nu}}
 \newunicodechar{ξ}{\ensuremath{\xi}}
 \newunicodechar{ο}{\ensuremath{o}}
@@ -67,6 +71,9 @@
 \newunicodechar{↔}{\ensuremath{\leftrightarrow}}
 \newunicodechar{⇒}{\ensuremath{\Rightarrow}}
 \newunicodechar{↦}{\ensuremath{\mapsto}}
+\newunicodechar{⇔}{\ensuremath{\Leftrightarrow}}
+\newunicodechar{↑}{\ensuremath{\uparrow}}
+\newunicodechar{↓}{\ensuremath{\downarrow}}
 
 % ---------- Triangle ----------
 \newunicodechar{◃}{\ensuremath{\triangleleft}}
@@ -89,6 +96,12 @@
 \newunicodechar{≥}{\ensuremath{\geq}}
 \newunicodechar{≠}{\ensuremath{\neq}}
 \newunicodechar{∈}{\ensuremath{\in}}
+\newunicodechar{≅}{\ensuremath{\cong}}
+\newunicodechar{≢}{\ensuremath{\not\equiv}}
+\newunicodechar{≈}{\ensuremath{\approx}}
+\newunicodechar{∼}{\ensuremath{\sim}}
+\newunicodechar{⊢}{\ensuremath{\vdash}}
+\newunicodechar{＝}{\ensuremath{=}}
 
 % ---------- Operators ----------
 \newunicodechar{×}{\ensuremath{\times}}
@@ -96,11 +109,31 @@
 \newunicodechar{·}{\ensuremath{\cdot}}
 \newunicodechar{⊎}{\ensuremath{\uplus}}
 \newunicodechar{∥}{\ensuremath{\Vert}}
+\newunicodechar{•}{\ensuremath{\bullet}}
+\newunicodechar{∙}{\ensuremath{\cdot}}
+\newunicodechar{∗}{\ensuremath{\ast}}
+\newunicodechar{⊚}{\ensuremath{\circledcirc}}
+\newunicodechar{⊔}{\ensuremath{\sqcup}}
+\newunicodechar{⊗}{\ensuremath{\otimes}}
+\newunicodechar{⊕}{\ensuremath{\oplus}}
+\newunicodechar{∑}{\ensuremath{\Sigma}}
+\newunicodechar{◇}{\ensuremath{\Diamond}}
+\newunicodechar{∷}{\ensuremath{\mathbin{::}}}
+
+% ---------- Logic ----------
+\newunicodechar{∀}{\ensuremath{\forall}}
+\newunicodechar{∃}{\ensuremath{\exists}}
+\newunicodechar{¬}{\ensuremath{\neg}}
+\newunicodechar{∧}{\ensuremath{\wedge}}
+\newunicodechar{∨}{\ensuremath{\vee}}
 
 % ---------- Constants and blackboard bold ----------
 \newunicodechar{⊤}{\ensuremath{\top}}
 \newunicodechar{⊥}{\ensuremath{\bot}}
 \newunicodechar{ℕ}{\ensuremath{\mathbb{N}}}
+\newunicodechar{ℤ}{\ensuremath{\mathbb{Z}}}
+\newunicodechar{𝟙}{\ensuremath{\mathds{1}}}
+\newunicodechar{ℓ}{\ensuremath{\ell}}
 
 % ---------- Subscript ----------
 \newunicodechar{₀}{\ensuremath{{}_{0}}}
@@ -114,6 +147,12 @@
 \newunicodechar{₈}{\ensuremath{{}_{8}}}
 \newunicodechar{₉}{\ensuremath{{}_{9}}}
 \newunicodechar{ₙ}{\ensuremath{{}_{n}}}
+\newunicodechar{ᵢ}{\ensuremath{{}_{i}}}
+\newunicodechar{ⱼ}{\ensuremath{{}_{j}}}
+\newunicodechar{ₖ}{\ensuremath{{}_{k}}}
+\newunicodechar{ₘ}{\ensuremath{{}_{m}}}
+\newunicodechar{₊}{\ensuremath{{}_{+}}}
+\newunicodechar{₋}{\ensuremath{{}_{-}}}
 
 % ---------- Superscript ----------
 \newunicodechar{⁰}{\ensuremath{{}^{0}}}
@@ -130,6 +169,10 @@
 \newunicodechar{ᵃ}{\ensuremath{{}^{a}}}
 \newunicodechar{ᵇ}{\ensuremath{{}^{b}}}
 \newunicodechar{ᶜ}{\ensuremath{{}^{c}}}
+\newunicodechar{ⁿ}{\ensuremath{{}^{n}}}
+\newunicodechar{ᵒ}{\ensuremath{{}^{o}}}
+\newunicodechar{ᵖ}{\ensuremath{{}^{p}}}
+\newunicodechar{ᵛ}{\ensuremath{{}^{v}}}
 
 \newunicodechar{⁺}{\ensuremath{{}^{+}}}
 \newunicodechar{⁻}{\ensuremath{{}^{-}}}
@@ -146,4 +189,12 @@
 \newunicodechar{⌋}{\ensuremath{\rfloor}}
 \newunicodechar{⌈}{\ensuremath{\lceil}}
 \newunicodechar{⌉}{\ensuremath{\rceil}}
+
+% ---------- Specials ----------
+
+\newunicodechar{∞}{\ensuremath{\infty}}
+\newunicodechar{′}{\ensuremath{{}'}}
+\newunicodechar{″}{\ensuremath{{}''}}
+\newunicodechar{∎}{\ensuremath{\blacksquare}}
+
 \endinput

@@ -1,0 +1,49 @@
+\[
+\def\qB#1{\AgdaBound{#1}}%
+\def\qsem#1{\AgdaOperator{\AgdaFunction{⟦}}\;#1\;\AgdaOperator{\AgdaFunction{⟧}}}%
+\def\qsemtwo#1{\AgdaOperator{\AgdaFunction{2⟦}}\;#1\;\AgdaOperator{\AgdaFunction{⟧}}}%
+\def\qSig#1#2{\AgdaFunction{Σ[}\;#1\;\AgdaFunction{∈}\;#2\;\AgdaFunction{]}}%
+\def\qPi#1#2{(#1\;\AgdaSymbol{:}\;#2)}%
+\def\qtri{\;\AgdaOperator{\AgdaInductiveConstructor{◃}}\;}%
+\def\qsum{\;\AgdaOperator{\AgdaDatatype{⊎}}\;}%
+\def\qprod{\;\AgdaOperator{\AgdaFunction{×}}\;}%
+\def\qappS{\AgdaFunction{appS}}%
+\def\qappP{\AgdaFunction{appP}}%
+\def\qapp{\AgdaFunction{app}}%
+\def\qRF{(\qB{RF}\;\qB{s}\;\qB{pF})}%
+\def\qlet{\AgdaKeyword{let}\;(\qB{t}\;\AgdaOperator{\AgdaInductiveConstructor{,}}\;\qB{g})\;\AgdaSymbol{=}\;\qB{f}\;\qB{pF}\;\AgdaKeyword{in}}%
+\def\qShF{(\qPi{\qB{pF}}{\qB{PF}\;\qB{s}}\to\qSig{\qB{t}}{\qB{T}}\;(\qB{Q}\;\qB{t}\to\qappS\;\qRF\;\qB{F}))}%
+\begin{array}{cl}
+  & \qsem{\qapp\;\qB{H}\;\qB{F}}\;\qB{X} \\
+  & \quad \{\ \text{by definition of \qapp}\ \} \\
+≃ & \qsem{\qappS\;\qB{H}\;\qB{F}\qtri\qappP\;\qB{H}\;\qB{F}}\;\qB{X} \\
+  & \quad \{\ \text{by definition of \AgdaOperator{\AgdaFunction{⟦\AgdaUnderscore{}⟧}}}\ \} \\
+≃ & \qSig{\qB{s}}{\qappS\;\qB{H}\;\qB{F}}\;(\qappP\;\qB{H}\;\qB{F}\;\qB{s}\to\qB{X}) \\
+  & \quad \{\ \text{by definition of \qappS{} and \qappP, and associativity of \AgdaRecord{Σ}}\ \} \\
+≃ & \qSig{\qB{s}}{\qB{S}}\;\qSig{\qB{f}}{\qShF} \\
+  & \qquad ((\qB{PX}\;\qB{s}\qsum \\
+  & \qquad\quad \qSig{\qB{pF}}{\qB{PF}\;\qB{s}}\;\qlet\;\qSig{\qB{q}}{\qB{Q}\;\qB{t}}\;\qappP\;\qRF\;\qB{F}\;(\qB{g}\;\qB{q}))\to\qB{X}) \\
+  & \quad \{\ (\qB{A}\qsum\qB{B}\to\qB{X})\;≃\;(\qB{A}\to\qB{X})\qprod(\qB{B}\to\qB{X})\text{, and currying}\ \} \\
+≃ & \qSig{\qB{s}}{\qB{S}}\;\qSig{\qB{f}}{\qShF} \\
+  & \qquad ((\qB{PX}\;\qB{s}\to\qB{X})\qprod \\
+  & \qquad\quad (\qPi{\qB{pF}}{\qB{PF}\;\qB{s}}\to\qlet\;\qPi{\qB{q}}{\qB{Q}\;\qB{t}}\to\qappP\;\qRF\;\qB{F}\;(\qB{g}\;\qB{q})\to\qB{X})) \\
+  & \quad \{\ \text{commutativity and associativity of \AgdaRecord{Σ} and \AgdaFunction{×}}\ \} \\
+≃ & \qSig{\qB{s}}{\qB{S}}\;((\qB{PX}\;\qB{s}\to\qB{X})\qprod\qSig{\qB{f}}{\qShF} \\
+  & \qquad (\qPi{\qB{pF}}{\qB{PF}\;\qB{s}}\to\qlet\;\qPi{\qB{q}}{\qB{Q}\;\qB{t}}\to\qappP\;\qRF\;\qB{F}\;(\qB{g}\;\qB{q})\to\qB{X})) \\
+  & \quad \{\ \text{distributivity of \AgdaRecord{Π} over \AgdaRecord{Σ}, twice}\ \} \\
+≃ & \qSig{\qB{s}}{\qB{S}}\;((\qB{PX}\;\qB{s}\to\qB{X})\qprod \\
+  & \qquad (\qPi{\qB{pF}}{\qB{PF}\;\qB{s}}\to\qSig{\qB{t}}{\qB{T}}\;(\qB{Q}\;\qB{t}\to \\
+  & \qquad\quad \qSig{\qB{r}}{\qappS\;\qRF\;\qB{F}}\;(\qappP\;\qRF\;\qB{F}\;\qB{r}\to\qB{X})))) \\
+  & \quad \{\ \text{by definition of \AgdaOperator{\AgdaFunction{⟦\AgdaUnderscore{}⟧}} and \qapp}\ \} \\
+≃ & \qSig{\qB{s}}{\qB{S}}\;((\qB{PX}\;\qB{s}\to\qB{X})\qprod \\
+  & \qquad (\qPi{\qB{pF}}{\qB{PF}\;\qB{s}}\to\qSig{\qB{t}}{\qB{T}}\;(\qB{Q}\;\qB{t}\to\qsem{\qapp\;\qRF\;\qB{F}}\;\qB{X}))) \\
+  & \quad \{\ \text{by definition of \AgdaOperator{\AgdaFunction{⟦\AgdaUnderscore{}⟧}}, with } \qB{F}\;\AgdaSymbol{=}\;\qB{T}\qtri\qB{Q}\ \} \\
+≃ & \qSig{\qB{s}}{\qB{S}}\;((\qB{PX}\;\qB{s}\to\qB{X})\qprod \\
+  & \qquad (\qPi{\qB{pF}}{\qB{PF}\;\qB{s}}\to\qsem{\qB{F}}\;(\qsem{\qapp\;\qRF\;\qB{F}}\;\qB{X}))) \\
+  & \quad \{\ \text{induction hypothesis for } \qB{RF}\;\qB{s}\;\qB{pF}\ \} \\
+≃ & \qSig{\qB{s}}{\qB{S}}\;((\qB{PX}\;\qB{s}\to\qB{X})\qprod \\
+  & \qquad (\qPi{\qB{pF}}{\qB{PF}\;\qB{s}}\to\qsem{\qB{F}}\;(\qsemtwo{\qB{RF}\;\qB{s}\;\qB{pF}}\;\qsem{\qB{F}}\;\qB{X}))) \\
+  & \quad \{\ \text{by definition of \AgdaOperator{\AgdaFunction{2⟦\AgdaUnderscore{}⟧}}}\ \} \\
+≃ & \qsemtwo{\qB{H}}\;\qsem{\qB{F}}\;\qB{X}
+\end{array}
+\]

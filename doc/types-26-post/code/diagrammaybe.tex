@@ -1,0 +1,13 @@
+\[
+\begin{tikzcd}[column sep=huge, row sep=large]
+  \AgdaFunction{Maybe}\,\AgdaDatatype{ℕ}
+    \arrow[r, "\AgdaFunction{Maybe₁}\,\AgdaSymbol{(}\AgdaFunction{foldℕ}\,
+      \AgdaBound{α}\AgdaSymbol{)}"]
+    \arrow[d, "\AgdaInductiveConstructor{[z,s]}"] &
+  \AgdaFunction{Maybe}\,\AgdaBound{A}
+    \arrow[d, "\AgdaBound{α}"] \\
+  \AgdaDatatype{ℕ}
+    \arrow[r, dashed, "\AgdaFunction{foldℕ}\,\AgdaBound{α}"] &
+  \AgdaBound{A}
+\end{tikzcd}
+\]

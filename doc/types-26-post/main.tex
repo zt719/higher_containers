@@ -1,28 +1,30 @@
-\documentclass[a4paper,UKenglish,cleveref, autoref, thm-restate]{lipics-v2021}
+\documentclass[a4paper,USenglish,cleveref, autoref, thm-restate]{lipics-v2021}
 
 \usepackage{agda}
 \usepackage{unicode}
 \usepackage[utf8]{inputenc}
 \usepackage{tikz-cd}
-\usepackage[normalem]{ulem}
 
-\bibliographystyle{plainurl}% the mandatory bibstyle
+\bibliographystyle{plainurl}
 
-\title{Containers in Higher Kinds} %TODO Please add
+\title{Containers in Higher Kinds}
 
-%\titlerunning{Dummy short title} %TODO optional, please use if title is longer than one line
--- Altenkirch, Gylterud, Tian
-\author{Jane {Open Access}}{Dummy University Computing Laboratory, [optional: Address], Country \and My second affiliation, Country \and \url{http://www.myhomepage.edu} }{johnqpublic@dummyuni.org}{https://orcid.org/0000-0002-1825-0097}{(Optional) author-specific funding acknowledgements}%TODO mandatory, please use full name; only 1 author per \author macro; first two parameters are mandatory, other parameters can be empty. Please provide at least the name of the affiliation and the country. The full address is optional. Use additional curly braces to indicate the correct name splitting when the last name consists of multiple name parts.
+\author{Thorsten Altenkirch}{School of Computer Science, University of Nottingham, UK
+}{psztxa@nottingham.ac.uk}{https://orcid.org/0000-0002-6582-5025}{}
 
-\author{Joan R. Public\footnote{Optional footnote, e.g. to mark corresponding author}}{Department of Informatics, Dummy College, [optional: Address], Country}{joanrpublic@dummycollege.org}{[orcid]}{[funding]}
+\author{Håkon Robbestad Gylterud}{Department of Informatics, University of Bergen, Norway}{hakon@gylterud.net}{https://orcid.org/0009-0009-9871-1110}{}
 
-\authorrunning{J. Open Access and J.\,R. Public} %TODO mandatory. First: Use abbreviated first/middle names. Second (only in severe cases): Use first author plus 'et al.'
+\author{Zhili Tian}{School of Computer Science, University of Nottingham, UK
+}{pxszt8@nottingham.ac.uk}{https://orcid.org/0009-0009-6562-4889}{}
 
-\Copyright{Jane Open Access and Joan R. Public} %TODO mandatory, please use full first names. LIPIcs license is "CC-BY";  http://creativecommons.org/licenses/by/3.0/
+\authorrunning{T. Altenkirch, H.\,R. Gylterud, and Z. Tian}
 
-\ccsdesc[100]{\textcolor{red}{Replace ccsdesc macro with valid one}} %TODO mandatory: Please choose ACM 2012 classifications from https://dl.acm.org/ccs/ccs_flat.cfm 
+\Copyright{Thorsten Altenkirch, Håkon Robbestad Gylterud, and Zhili Tian}
 
-\keywords{} %TODO mandatory; please add comma-separated list of keywords
+\ccsdesc[500]{Theory of computation~Type theory}
+\ccsdesc[300]{Theory of computation~Categorical semantics}
+
+\keywords{containers, higher-kinded types, proof assisstant}
 
 \category{} %optional, e.g. invited paper
 
@@ -52,8 +54,6 @@
 \ArticleNo{23}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% \usepackage{minted}
-
 \begin{document}
 
 \maketitle
@@ -65,13 +65,13 @@ datatypes such as \emph{Bush}, however, arise as fixpoints of functors on
 \emph{containers} rather than on types. We introduce second-order containers,
 which represent such functors, and construct their initial algebras and
 terminal coalgebras (2W and 2M) using induction-induction and
-coinduction-induction. We then generalise to containers at all higher kinds,
+coinduction-induction. We then generalize to containers at all higher kinds,
 given as normal forms of a simply-typed $\lambda$-calculus representing
 functions on types using infinite products and coproducts. We show that, in this setting, fixpoints
 beyond the second order do not exist: a third-order fixpoint operator would
 yield an internal fixpoint for every type operator, which contradicts Cantor's
 theorem. We discuss ways to overcome this limitation and to further extend
-higher containers. All results are formalised in Cubical Agda.
+higher containers. All results are formalized in Cubical Agda.
 \end{abstract}
 
 \input{sections/introduction}

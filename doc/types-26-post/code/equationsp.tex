@@ -1,0 +1,23 @@
+\[
+\begin{array}{cl}
+  & \AgdaRecord{S}\;\AgdaInductiveConstructor{◃}\;\AgdaRecord{P} \\
+  & \quad \{\ \text{by assumption} \} \\
+≃ & \AgdaFunction{SigBushᶜ}\;(\AgdaRecord{S}\;\AgdaInductiveConstructor{◃}\;\AgdaRecord{P}) \\
+  & \quad \{\ \text{by definition of \AgdaFunction{SigBushᶜ}}\ \} \\
+≃ & \AgdaFunction{⊤ᶜ}\;\AgdaFunction{⊎ᶜ}\;\AgdaFunction{1ᶜ}\;\AgdaFunction{×ᶜ}\;(\AgdaRecord{S}\;\AgdaInductiveConstructor{◃}\;\AgdaRecord{P})\;\AgdaOperator{\AgdaFunction{⊗ᶜ}}\;(\AgdaRecord{S}\;\AgdaInductiveConstructor{◃}\;\AgdaRecord{P}) \\
+  & \quad \{\ \text{by definition of \AgdaOperator{\AgdaFunction{⊗ᶜ}}}\ \} \\
+≃ & \AgdaFunction{⊤ᶜ}\;\AgdaFunction{⊎ᶜ}\;\AgdaFunction{1ᶜ}\;\AgdaFunction{×ᶜ}\;(\AgdaFunction{Σ}\,[\,\AgdaBound{s}\in\AgdaRecord{S}\,]\;(\AgdaRecord{P}\;\AgdaBound{s}\to\AgdaRecord{S})
+    \;\AgdaInductiveConstructor{◃}\;
+\AgdaSymbol{λ\{}\;(\AgdaBound{s}\;\AgdaOperator{\AgdaInductiveConstructor{,}}\;\AgdaBound{f})\to\AgdaFunction{Σ}\,[\,\AgdaBound{p}\in\AgdaRecord{P}\;\AgdaBound{s}\,]\;\AgdaRecord{P}\,(\AgdaBound{f}\;\AgdaBound{p})\AgdaSymbol{\}}) \\
+  & \quad \{\ \text{by definition of \AgdaFunction{1ᶜ} and \AgdaFunction{×ᶜ}}\ \} \\
+≃ & \AgdaFunction{⊤ᶜ}\;\AgdaFunction{⊎ᶜ}\;(\AgdaFunction{Σ}\,[\,\AgdaBound{s}\in\AgdaRecord{S}\,]\;(\AgdaRecord{P}\;\AgdaBound{s}\to\AgdaRecord{S})
+    \;\AgdaInductiveConstructor{◃}\;
+\AgdaSymbol{λ\{}\;(\AgdaBound{s}\;\AgdaOperator{\AgdaInductiveConstructor{,}}\;\AgdaBound{f})\to\AgdaDatatype{⊤}\;\AgdaDatatype{⊎}\;\AgdaFunction{Σ}\,[\,\AgdaBound{p}\in\AgdaRecord{P}\;\AgdaBound{s}\,]\;\AgdaRecord{P}\,(\AgdaBound{f}\;\AgdaBound{p})\AgdaSymbol{\}}) \\
+  & \quad \{\ \text{by definition of \AgdaFunction{⊤ᶜ} and \AgdaFunction{⊎ᶜ}}\ \} \\
+≃ & \AgdaDatatype{⊤}\;\AgdaDatatype{⊎}\;\AgdaFunction{Σ}\,[\,\AgdaBound{s}\in\AgdaRecord{S}\,]\;(\AgdaRecord{P}\;\AgdaBound{s}\to\AgdaRecord{S})
+    \;\AgdaInductiveConstructor{◃}\;
+\AgdaSymbol{λ\{}\;(\AgdaInductiveConstructor{inj₁}\;\AgdaInductiveConstructor{tt})\to\AgdaDatatype{⊥}\;\AgdaSymbol{;}\\
+  & \hphantom{\AgdaDatatype{⊤}\;\AgdaDatatype{⊎}\;\AgdaFunction{Σ}\,[\,\AgdaBound{s}\in\AgdaRecord{S}\,]\;(\AgdaRecord{P}\;\AgdaBound{s}\to\AgdaRecord{S})\;\AgdaInductiveConstructor{◃}\;\AgdaSymbol{λ\{}}\;
+(\AgdaInductiveConstructor{inj₂}\;(\AgdaBound{s}\;\AgdaOperator{\AgdaInductiveConstructor{,}}\;\AgdaBound{f}))\to\AgdaDatatype{⊤}\;\AgdaDatatype{⊎}\;\AgdaFunction{Σ}\,[\,\AgdaBound{p}\in\AgdaRecord{P}\;\AgdaBound{s}\,]\;\AgdaRecord{P}\,(\AgdaBound{f}\;\AgdaBound{p})\AgdaSymbol{\}}
+\end{array}
+\]

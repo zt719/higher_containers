@@ -1,8 +1,9 @@
 \section{Second-Order}
+\label{sec:second}
 
 In this section, we begin by examining the nested datatype
 \AgdaDatatype{Bush} as a motivating example, and work out its semantics by
-constructing an explicit container representation. We then generalise this
+constructing an explicit container representation. We then generalize this
 example to an arbitrary second-order setting, introducing second-order
 containers and second-order W-types (and M-types).
 
@@ -98,32 +99,7 @@ representation of \AgdaDatatype{Bush}. Suppose that
 is the initial algebra of \AgdaFunction{SigBushᶜ}. The construction is guided
 by the following calculation:
 
-\[
-\begin{array}{cl}
-  & \AgdaRecord{S}\;\AgdaInductiveConstructor{◃}\;\AgdaRecord{P} \\
-  & \quad \{\ \text{by assumption} \} \\
-≃ & \AgdaFunction{SigBushᶜ}\;(\AgdaRecord{S}\;\AgdaInductiveConstructor{◃}\;\AgdaRecord{P}) \\
-  & \quad \{\ \text{by definition of \AgdaFunction{SigBushᶜ}}\ \} \\
-≃ & \AgdaFunction{⊤ᶜ}\;\AgdaFunction{⊎ᶜ}\;(\AgdaFunction{1ᶜ}\;\AgdaFunction{×ᶜ}\;(\AgdaRecord{S}\;\AgdaInductiveConstructor{◃}\;\AgdaRecord{P})\;\AgdaOperator{\AgdaFunction{⊗ᶜ}}\;(\AgdaRecord{S}\;\AgdaInductiveConstructor{◃}\;\AgdaRecord{P})) \\
-  & \quad \{\ \text{by definition of \AgdaOperator{\AgdaFunction{⊗ᶜ}}}\ \} \\
-≃ & \AgdaFunction{⊤ᶜ}\;\AgdaFunction{⊎ᶜ}\;(\AgdaFunction{1ᶜ}\;\AgdaFunction{×ᶜ}\;(\AgdaFunction{Σ}\,[\,\AgdaBound{s}\in\AgdaRecord{S}\,]\;(\AgdaRecord{P}\;\AgdaBound{s}\to\AgdaRecord{S})
-    \;\AgdaInductiveConstructor{◃}\;
-    λ\,(\AgdaBound{s}\,,\AgdaBound{f})\to\AgdaFunction{Σ}\,[\,\AgdaBound{p}\in\AgdaRecord{P}\;\AgdaBound{s}\,]\;\AgdaRecord{P}\,(\AgdaBound{f}\;\AgdaBound{p}))) \\
-  & \quad \{\ \text{by definition of \AgdaFunction{1ᶜ} and \AgdaFunction{×ᶜ}}\ \} \\
-≃ & \AgdaFunction{⊤ᶜ}\;\AgdaFunction{⊎ᶜ}\;(\AgdaFunction{Σ}\,[\,\AgdaBound{s}\in\AgdaRecord{S}\,]\;(\AgdaRecord{P}\;\AgdaBound{s}\to\AgdaRecord{S})
-    \;\AgdaInductiveConstructor{◃}\;
-    λ\,(\AgdaBound{s}\,,\AgdaBound{f})\to\AgdaDatatype{⊤}\;\AgdaDatatype{⊎}\;\AgdaFunction{Σ}\,[\,\AgdaBound{p}\in\AgdaRecord{P}\;\AgdaBound{s}\,]\;\AgdaRecord{P}\,(\AgdaBound{f}\;\AgdaBound{p})) \\
-  & \quad \{\ \text{by definition of \AgdaFunction{⊤ᶜ} and \AgdaFunction{⊎ᶜ}}\ \} \\
-≃ & \AgdaDatatype{⊤}\;\AgdaDatatype{⊎}\;\AgdaFunction{Σ}\,[\,\AgdaBound{s}\in\AgdaRecord{S}\,]\;(\AgdaRecord{P}\;\AgdaBound{s}\to\AgdaRecord{S})
-    \;\AgdaInductiveConstructor{◃}\;
-    \AgdaFunction{case}\;(λ\,\AgdaInductiveConstructor{tt}\to\AgdaDatatype{⊥})\;
-    (λ\,(\AgdaBound{s}\,,\AgdaBound{f})\to\AgdaDatatype{⊤}\;\AgdaDatatype{⊎}\;\AgdaFunction{Σ}\,[\,\AgdaBound{p}\in\AgdaRecord{P}\;\AgdaBound{s}\,]\;\AgdaRecord{P}\,(\AgdaBound{f}\;\AgdaBound{p}))
-\end{array}
-\]
-
-where \AgdaFunction{case} is the universal map out of a coproduct:
-
-\input{code/case}
+\input{code/equationsp}
 
 Reading off the solution of this equation, we define the shapes and positions
 mutually by induction-induction:
@@ -137,11 +113,11 @@ positions must be finite: you only provide finite terms to a constructor or a
 field.
 
 We prove that \AgdaFunction{Bushᶜ} is indeed the initial algebra of
-\AgdaFunction{SigBushᶜ}; the proof can be found in our formalisation.
+\AgdaFunction{SigBushᶜ}; the proof can be found in our formalization.
 
 \paragraph*{Second-Order Containers}
 
-The example above generalises to arbitrary second-order polynomial functors. By
+The example above generalizes to arbitrary second-order polynomial functors. By
 a second-order polynomial we mean a polynomial in both a variable $x$ and a
 function variable $f$, for instance $h (f , x) = 1 + x * f (f x)$. We therefore
 introduce the following syntax for second-order containers:
@@ -176,6 +152,10 @@ part, as with \AgdaFunction{appS} and \AgdaFunction{appP}. The definition of
    \;\AgdaFunction{≃}\;
    \AgdaOperator{\AgdaFunction{⟦}}\;\AgdaFunction{app}\;\AgdaBound{H}\;\AgdaBound{F}\;\AgdaOperator{\AgdaFunction{⟧}}\;\AgdaBound{X} \]
 
+We assume \AgdaBound{H}\;\AgdaSymbol{=}\;\AgdaBound{S}\;\AgdaOperator{\AgdaInductiveConstructor{◃}}\;\AgdaBound{PX}\;\AgdaOperator{\AgdaInductiveConstructor{+}}\;\AgdaBound{PF}\;\AgdaOperator{\AgdaInductiveConstructor{+}}\;\AgdaBound{RF} and \AgdaBound{F}\;\AgdaSymbol{=}\;\AgdaBound{T}\;\AgdaOperator{\AgdaInductiveConstructor{◃}}\;\AgdaBound{Q}, and proceed by induction on \AgdaBound{H}, assuming that the equation already holds for every \AgdaBound{RF}\;\AgdaBound{s}\;\AgdaBound{pF}:
+
+\input{code/equationapp}
+
 \paragraph*{Second-Order W-type}
 
 Does every second-order container have an initial algebra? We answer this
@@ -184,7 +164,6 @@ second-order container \AgdaBound{H} and an \AgdaBound{H}-algebra
 \AgdaSymbol{(}\AgdaBound{F}\AgdaSymbol{,}\AgdaBound{α}\AgdaSymbol{)}, we require
 a unique \AgdaFunction{fold2W} making the following diagram commute:
 
-\[
 \begin{tikzcd}[column sep=8em, row sep=large]
   \AgdaFunction{app}\;\AgdaBound{H}\;(\AgdaFunction{2W}\;\AgdaBound{H})
     \arrow[r, "{\AgdaFunction{app₁}\;\AgdaBound{H}\;(\AgdaFunction{fold2W}\;\AgdaBound{α})}"]
@@ -195,10 +174,8 @@ a unique \AgdaFunction{fold2W} making the following diagram commute:
     \arrow[r, dashed, "{\AgdaFunction{fold2W}\;\AgdaBound{α}}"'] &
   \AgdaBound{F}
 \end{tikzcd}
-\]
 
-We first construct \AgdaFunction{2W}, which must be a fixed point of
-\AgdaFunction{app}\AgdaSpace{}\AgdaBound{H}:
+We first construct \AgdaFunction{2W}, which must be a fixed point of \AgdaFunction{app}\AgdaSpace{}\AgdaBound{H}:
 
 \[ \AgdaFunction{2W}\;\AgdaBound{H}\;\AgdaFunction{≃}\;\AgdaFunction{app}\;\AgdaBound{H}\;(\AgdaFunction{2W}\;\AgdaBound{H}) \]
 
@@ -215,21 +192,21 @@ However, Agda rejects both \AgdaDatatype{2WS} and \AgdaDatatype{2WP} as not
 strictly positive, even though they are morally strictly positive. This is
 because \AgdaFunction{appS} and \AgdaFunction{appP} are defined by recursion,
 and Agda cannot unfold such recursive definitions when checking strict
-positivity. Our solution is to generalise the original equation to:
+positivity. Our solution is to generalize the original equation to:
 
-\[ \AgdaFunction{2W-d}\;\AgdaBound{H'}\;\AgdaBound{H}\;\AgdaFunction{≃}\;\AgdaFunction{app}\;\AgdaBound{H'}\;(\AgdaFunction{2W-d}\;\AgdaBound{H'}\;\AgdaBound{H}) \]
+\AgdaFunction{2W-d}\;\AgdaBound{H'}\;\AgdaBound{H}\;\AgdaFunction{≃}\;\AgdaFunction{app}\;\AgdaBound{H'}\;(\AgdaFunction{2W-d}\;\AgdaBound{H'}\;\AgdaBound{H})
 
 Splitting again into shapes and positions:
 
-\[ \AgdaRecord{2WS-d}\;\AgdaBound{H'}\;\AgdaBound{H}\;\AgdaOperator{\AgdaInductiveConstructor{◃}}\;\AgdaDatatype{2WP-d}\;\AgdaBound{H'}\;\AgdaBound{H}\;\AgdaFunction{≃}\;\AgdaFunction{appS}\;\AgdaBound{H'}\;(\AgdaFunction{2W-d}\;\AgdaBound{H'}\;\AgdaBound{H})\;\AgdaOperator{\AgdaInductiveConstructor{◃}}\;\AgdaFunction{appP}\;\AgdaBound{H'}\;(\AgdaFunction{2W-d}\;\AgdaBound{H'}\;\AgdaBound{H}) \]
+\AgdaRecord{2WS-d}\;\AgdaBound{H'}\;\AgdaBound{H}\;\AgdaOperator{\AgdaInductiveConstructor{◃}}\;\AgdaDatatype{2WP-d}\;\AgdaBound{H'}\;\AgdaBound{H}\;\AgdaFunction{≃}\;\AgdaFunction{appS}\;\AgdaBound{H'}\;(\AgdaFunction{2W-d}\;\AgdaBound{H'}\;\AgdaBound{H})\;\AgdaOperator{\AgdaInductiveConstructor{◃}}\;\AgdaFunction{appP}\;\AgdaBound{H'}\;(\AgdaFunction{2W-d}\;\AgdaBound{H'}\;\AgdaBound{H})
 
 This equation can now be turned into a well-typed definition by
 induction-induction:
 
 \input{code/2w-d}
 
-This diagonalisation trick works for the following reason. On shapes, the
-inductive definition of \AgdaRecord{2WS-d} internalises the recursive
+This diagonalization trick works for the following reason. On shapes, the
+inductive definition of \AgdaRecord{2WS-d} internalizes the recursive
 definition of \AgdaFunction{appS} by performing induction over \AgdaBound{H'}.
 We must keep a separate copy of \AgdaBound{H}, since \AgdaFunction{2W}\;
 \AgdaBound{H}, which is the special case \AgdaFunction{2W-d}\;\AgdaBound{H}\;
@@ -240,10 +217,9 @@ positions.
 
 Finally, \AgdaFunction{2W} is recovered by instantiating both arguments to
 \AgdaBound{H} and recombining the shape and position parts:
+\AgdaFunction{2W}\;\AgdaBound{H}\;\AgdaSymbol{=}\;\AgdaDatatype{2WS-d}\;\AgdaBound{H}\;\AgdaBound{H}\;\AgdaOperator{\AgdaInductiveConstructor{◃}}\;\AgdaDatatype{2WP-d}\;\AgdaBound{H}\;\AgdaBound{H}
 
-\input{code/2w}
-
-It remains to construct the remaining components of the diagram. Concretely,
+It remains to construct many other components of the diagram. Concretely,
 we define \AgdaFunction{2sup}, the algebra structure on \AgdaFunction{2W};
 \AgdaFunction{fold2W}, the second-order folding function;
 \AgdaFunction{commute2W}, which shows that the diagram commutes;

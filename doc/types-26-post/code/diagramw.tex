@@ -1,0 +1,14 @@
+\[
+\begin{tikzcd}[column sep=huge, row sep=large]
+  \AgdaFunction{⟦}\,\AgdaBound{SP}\,\AgdaFunction{⟧}\,
+  \AgdaSymbol{(}\,\AgdaDatatype{W}\,\AgdaBound{SP}\AgdaSymbol{)}
+  \arrow[r, "\AgdaFunction{⟦}\,\AgdaBound{SP}\,\AgdaFunction{⟧₁}\,
+    \AgdaSymbol{(}\AgdaFunction{foldW}\,\AgdaBound{α}\AgdaSymbol{)}"]
+    \arrow[d, "\AgdaInductiveConstructor{sup}"] &
+  \AgdaFunction{⟦}\,\AgdaBound{SP}\,\AgdaFunction{⟧}\,\AgdaBound{A}
+    \arrow[d, "\AgdaBound{α}"] \\
+  \AgdaDatatype{W}\,\AgdaBound{SP}
+    \arrow[r, dashed, "\AgdaFunction{foldW}\,\AgdaBound{α}"] &
+  \AgdaBound{A}
+\end{tikzcd}
+\]

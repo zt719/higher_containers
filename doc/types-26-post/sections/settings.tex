@@ -1,29 +1,6 @@
 \section{Settings}
 \label{sec:settings}
 
-Our metatheory is HoTT, and we formalise this work in Cubical Agda. Equality is
-given by the path type
-\AgdaPrimitive{Path}\AgdaSpace{}%
-\AgdaBound{x}\AgdaSpace{}%
-\AgdaBound{y}%
-, or
-\AgdaBound{x}\AgdaSpace{}%
-\AgdaFunction{≡}\AgdaSpace{}%
-\AgdaBound{y}%
-, which is provided primitively in the cubical setting: a path is a function
-from an abstract interval whose endpoints are \AgdaBound{x} and \AgdaBound{y}.
-One benefit of working in cubical type theory is that function extensionality
-\AgdaFunction{funExt} is derivable and computes: two functions are equal if they
-agree on every input, rather than being definitionally equal. Cubical Agda also
-supports heterogeneous equality primitively through \AgdaPrimitive{PathP}.
+Our metatheory is HoTT, and we formalize this work in Cubical Agda. Equality is given by the path type \AgdaPrimitive{Path}\;\AgdaBound{x}\;\AgdaBound{y}, or \AgdaBound{x}\;\AgdaFunction{≡}\;\AgdaBound{y}, which is provided primitively in the cubical setting: a path is a function from an abstract interval whose endpoints are \AgdaBound{x} and \AgdaBound{y}. One benefit of working in cubical type theory is that function extensionality \AgdaFunction{funExt} is derivable and computes: two functions are equal if they agree on every input, rather than being definitionally equal. Cubical Agda also supports heterogeneous equality primitively through \AgdaPrimitive{PathP}.
 
-We do not assume axiom K (uniqueness of identity proofs), and reason about
-equality only through the J-rule (path induction). We write
-\AgdaPrimitive{Type} for the universe of types, whose elements are \emph{not}
-assumed to be homotopy sets (\AgdaFunction{hSet}). At the same time, we do not
-rely on any higher path structure of the types we study: our constructions
-neither assume truncation nor make use of higher paths. Accordingly, the
-categories considered in this paper are \emph{wild categories}: the morphisms
-between two objects form an arbitrary \AgdaPrimitive{Type} rather than an
-\AgdaFunction{hSet}, the unit and associativity laws hold up to paths, and no
-higher coherence conditions between these laws are required.
+We do not assume axiom K (uniqueness of identity proofs), and reason about equality only through the J-rule (path induction). We write \AgdaPrimitive{Type} for the universe of types, whose elements are \emph{not} assumed to be homotopy sets \AgdaFunction{hSet}. At the same time, the types we study do not rely on any higher path structure: they have no truncations. Accordingly, the categories considered in this paper are wild categories: the morphisms between two objects form a \AgdaPrimitive{Type} rather than a \AgdaFunction{hSet}, the unit and associativity laws hold up to paths, and no higher coherence conditions between these laws are required.

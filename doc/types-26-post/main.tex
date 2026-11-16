@@ -8,10 +8,10 @@
 
 \bibliographystyle{plainurl}% the mandatory bibstyle
 
-\title{Dummy title} %TODO Please add
+\title{Containers in Higher Kinds} %TODO Please add
 
 %\titlerunning{Dummy short title} %TODO optional, please use if title is longer than one line
-
+-- Altenkirch, Gylterud, Tian
 \author{Jane {Open Access}}{Dummy University Computing Laboratory, [optional: Address], Country \and My second affiliation, Country \and \url{http://www.myhomepage.edu} }{johnqpublic@dummyuni.org}{https://orcid.org/0000-0002-1825-0097}{(Optional) author-specific funding acknowledgements}%TODO mandatory, please use full name; only 1 author per \author macro; first two parameters are mandatory, other parameters can be empty. Please provide at least the name of the affiliation and the country. The full address is optional. Use additional curly braces to indicate the correct name splitting when the last name consists of multiple name parts.
 
 \author{Joan R. Public\footnote{Optional footnote, e.g. to mark corresponding author}}{Department of Informatics, Dummy College, [optional: Address], Country}{joanrpublic@dummycollege.org}{[orcid]}{[funding]}
@@ -59,7 +59,19 @@
 \maketitle
 
 \begin{abstract}
-This is abstract  
+Containers represent strictly positive functors on types, and every container
+has an initial algebra (a W-type) and a terminal coalgebra (an M-type). Nested
+datatypes such as \emph{Bush}, however, arise as fixpoints of functors on
+\emph{containers} rather than on types. We introduce second-order containers,
+which represent such functors, and construct their initial algebras and
+terminal coalgebras (2W and 2M) using induction-induction and
+coinduction-induction. We then generalise to containers at all higher kinds,
+given as normal forms of a simply-typed $\lambda$-calculus representing
+functions on types using infinite products and coproducts. We show that, in this setting, fixpoints
+beyond the second order do not exist: a third-order fixpoint operator would
+yield an internal fixpoint for every type operator, which contradicts Cantor's
+theorem. We discuss ways to overcome this limitation and to further extend
+higher containers. All results are formalised in Cubical Agda.
 \end{abstract}
 
 \input{sections/introduction}

@@ -1,0 +1,167 @@
+\documentclass{article}
+
+\usepackage{agda}
+\usepackage{unicode}
+\usepackage[utf8]{inputenc}
+
+\title{Containers in Higher Kinds}
+
+% Let lines with long inline code stretch instead of overflowing
+\emergencystretch=1.5em
+
+\begin{document}
+
+\maketitle
+
+Strictly positive functors can be represented as \emph{containers}~\cite{containers}: a type of shapes \AgdaBound{S}\;\AgdaSymbol{:}\;\AgdaPrimitive{Type} together with a family of positions \AgdaBound{P}\;\AgdaSymbol{:}\;\AgdaBound{S}\;\AgdaSymbol{→}\;\AgdaPrimitive{Type}, which gives rise to a functor \AgdaFunction{⟦}\;\AgdaBound{S}\;\AgdaOperator{\AgdaInductiveConstructor{◃}}\;\AgdaBound{P}\;\AgdaFunction{⟧}\;\AgdaSymbol{:}\;\AgdaPrimitive{Type}\;\AgdaSymbol{→}\;\AgdaPrimitive{Type}. Every container has an initial algebra, the W-type, and a terminal coalgebra, the M-type~\cite{containers,ahrens2015nonwellfounded}. However, some inductive and coinductive types do not fit the scheme of W-types and M-types. A typical example is the nested datatype~\cite{bird1998nested}:
+
+\begin{code}%
+\>[0]\AgdaKeyword{data}\AgdaSpace{}%
+\AgdaDatatype{Bush}\AgdaSpace{}%
+\AgdaSymbol{(}\AgdaBound{A}\AgdaSpace{}%
+\AgdaSymbol{:}\AgdaSpace{}%
+\AgdaPrimitive{Type}\AgdaSymbol{)}\AgdaSpace{}%
+\AgdaSymbol{:}\AgdaSpace{}%
+\AgdaPrimitive{Type}\AgdaSpace{}%
+\AgdaKeyword{where}\<%
+\\
+\>[0][@{}l@{\AgdaIndent{0}}]%
+\>[2]\AgdaInductiveConstructor{[]}\AgdaSpace{}%
+\AgdaSymbol{:}\AgdaSpace{}%
+\AgdaDatatype{Bush}\AgdaSpace{}%
+\AgdaBound{A}\<%
+\\
+%
+\>[2]\AgdaOperator{\AgdaInductiveConstructor{\AgdaUnderscore{}::\AgdaUnderscore{}}}\AgdaSpace{}%
+\AgdaSymbol{:}\AgdaSpace{}%
+\AgdaBound{A}\AgdaSpace{}%
+\AgdaSymbol{→}\AgdaSpace{}%
+\AgdaDatatype{Bush}\AgdaSpace{}%
+\AgdaSymbol{(}\AgdaDatatype{Bush}\AgdaSpace{}%
+\AgdaBound{A}\AgdaSymbol{)}\AgdaSpace{}%
+\AgdaSymbol{→}\AgdaSpace{}%
+\AgdaDatatype{Bush}\AgdaSpace{}%
+\AgdaBound{A}\<%
+\end{code}
+
+Because of its nested recursion, \AgdaDatatype{Bush}\;\AgdaBound{A} cannot be obtained as a W-type. Nevertheless, \AgdaDatatype{Bush} itself is represented by a container \AgdaFunction{Bushᶜ}\;\AgdaSymbol{:}\;\AgdaRecord{Cont}, which arises as the initial algebra of a functor on the category of containers~\cite{bird1998nested,bird1999generalised,johann2007initial}. This motivates a notion of containers at higher kinds, such as \AgdaSymbol{(}\AgdaInductiveConstructor{*}\;\AgdaOperator{\AgdaInductiveConstructor{⇒}}\;\AgdaInductiveConstructor{*}\AgdaSymbol{)}\;\AgdaOperator{\AgdaInductiveConstructor{⇒}}\;\AgdaInductiveConstructor{*}\;\AgdaOperator{\AgdaInductiveConstructor{⇒}}\;\AgdaInductiveConstructor{*} or \AgdaSymbol{(}\AgdaInductiveConstructor{*}\;\AgdaOperator{\AgdaInductiveConstructor{⇒}}\;\AgdaInductiveConstructor{*}\AgdaSymbol{)}\;\AgdaOperator{\AgdaInductiveConstructor{⇒}}\;\AgdaInductiveConstructor{*}, capable of representing strictly positive functors on containers.
+
+\paragraph{Second-Order Containers}
+
+We first introduce a syntax \AgdaRecord{2Cont} of second-order containers. It extends ordinary containers with a family of positions for the function variable, \AgdaBound{PF}\;\AgdaSymbol{:}\;\AgdaBound{S}\;\AgdaSymbol{→}\;\AgdaPrimitive{Type}, and an inductive continuation \mbox{\AgdaBound{RF}\;\AgdaSymbol{:}\;\AgdaSymbol{(}\AgdaBound{s}\;\AgdaSymbol{:}\;\AgdaBound{S}\AgdaSymbol{)}\;\AgdaSymbol{→}\;\AgdaBound{PF}\;\AgdaBound{s}\;\AgdaSymbol{→}\;\AgdaRecord{2Cont}}, which describes the argument applied to the function variable. Every second-order container is interpreted as a second-order type-level function, \AgdaFunction{2⟦\_⟧}\;\AgdaSymbol{:}\;\AgdaRecord{2Cont}\;\AgdaSymbol{→}\;\AgdaSymbol{(}\AgdaPrimitive{Type}\;\AgdaSymbol{→}\;\AgdaPrimitive{Type}\AgdaSymbol{)}\;\AgdaSymbol{→}\;\AgdaPrimitive{Type}\;\AgdaSymbol{→}\;\AgdaPrimitive{Type}. In our example, the signature of \AgdaDatatype{Bush}: \AgdaFunction{SigBush}\;\AgdaBound{F}\;\AgdaBound{X}\;\AgdaSymbol{=}\;\AgdaDatatype{⊤}\;\AgdaOperator{\AgdaDatatype{⊎}}\;\AgdaBound{X}\;\AgdaOperator{\AgdaDatatype{×}}\;\AgdaBound{F}\;\AgdaSymbol{(}\AgdaBound{F}\;\AgdaBound{X}\AgdaSymbol{)}, is precisely the interpretation of a second-order container \AgdaFunction{SigBushᶜ}\;\AgdaSymbol{:}\;\AgdaRecord{2Cont}. Categorically, every second-order container \AgdaBound{H} gives rise to an endofunctor on the category of containers, \AgdaFunction{app}\;\AgdaBound{H}\;\AgdaSymbol{:}\;\AgdaRecord{Cont}\;\AgdaSymbol{→}\;\AgdaRecord{Cont}.
+
+We also define a second-order least fixpoint operator \AgdaFunction{2W}\;\AgdaSymbol{:}\;\AgdaRecord{2Cont}\;\AgdaSymbol{→}\;\AgdaRecord{Cont} by induction-induction, and thereby recover \AgdaFunction{Bushᶜ} as the initial algebra of \AgdaFunction{app}\;\AgdaFunction{SigBushᶜ}. The second-order greatest fixpoint operator \AgdaFunction{2M}\;\AgdaSymbol{:}\;\AgdaRecord{2Cont}\;\AgdaSymbol{→}\;\AgdaRecord{Cont} is defined dually, using coinduction-induction.
+
+\paragraph{Higher-Order Containers}
+
+This story of constructing ``containers of containers'' can be iterated. We therefore introduce a general notion of higher-order containers, \AgdaFunction{HCont}\;\AgdaSymbol{:}\;\AgdaDatatype{Kind}\;\AgdaSymbol{→}\;\AgdaPrimitive{Type}, which covers containers of every kind. For brevity, we do not present the full syntax; we only remark that higher-order containers are closed normal forms of the simply-typed $\lambda$-calculus, defined mutually with neutral terms and spines, following the standard presentation of hereditary substitution~\cite{keller2010hereditary}. In this setting it is easy to see that \AgdaPrimitive{Type}\;\AgdaFunction{≅}\;\AgdaFunction{HCont}\;\AgdaInductiveConstructor{*}, \AgdaRecord{Cont}\;\AgdaFunction{≅}\;\AgdaFunction{HCont}\;\AgdaSymbol{(}\AgdaInductiveConstructor{*}\;\AgdaOperator{\AgdaInductiveConstructor{⇒}}\;\AgdaInductiveConstructor{*}\AgdaSymbol{)} and \AgdaRecord{2Cont}\;\AgdaFunction{≅}\;\AgdaFunction{HCont}\;\AgdaSymbol{((}\AgdaInductiveConstructor{*}\;\AgdaOperator{\AgdaInductiveConstructor{⇒}}\;\AgdaInductiveConstructor{*}\AgdaSymbol{)}\;\AgdaOperator{\AgdaInductiveConstructor{⇒}}\;\AgdaInductiveConstructor{*}\;\AgdaOperator{\AgdaInductiveConstructor{⇒}}\;\AgdaInductiveConstructor{*}\AgdaSymbol{)}.
+
+Every higher-order container can be interpreted as a type-level function, \AgdaFunction{H⟦\_⟧}\;\AgdaSymbol{:}\;\AgdaFunction{HCont}\;\AgdaBound{A}\;\AgdaSymbol{→}\;\AgdaFunction{⟦}\;\AgdaBound{A}\;\AgdaFunction{⟧k}, where \AgdaFunction{⟦\_⟧k}\;\AgdaSymbol{:}\;\AgdaDatatype{Kind}\;\AgdaSymbol{→}\;\AgdaPrimitive{Type₁} is the standard interpretation of kinds: \AgdaFunction{⟦}\;\AgdaInductiveConstructor{*}\;\AgdaFunction{⟧k}\;\AgdaSymbol{=}\;\AgdaPrimitive{Type} and \AgdaFunction{⟦}\;\AgdaBound{A}\;\AgdaOperator{\AgdaInductiveConstructor{⇒}}\;\AgdaBound{B}\;\AgdaFunction{⟧k}\;\AgdaSymbol{=}\;\AgdaFunction{⟦}\;\AgdaBound{A}\;\AgdaFunction{⟧k}\;\AgdaSymbol{→}\;\AgdaFunction{⟦}\;\AgdaBound{B}\;\AgdaFunction{⟧k}.
+
+Categorically, application of normal forms, computed by hereditary substitution,
+
+\[
+\AgdaFunction{napp}\;\AgdaSymbol{:}\;\AgdaFunction{HCont}\;\AgdaSymbol{(}\AgdaBound{A}\;\AgdaOperator{\AgdaInductiveConstructor{⇒}}\;\AgdaBound{B}\AgdaSymbol{)}\;\AgdaSymbol{→}\;\AgdaFunction{HCont}\;\AgdaBound{A}\;\AgdaSymbol{→}\;\AgdaFunction{HCont}\;\AgdaBound{B},
+\]
+turns every \AgdaBound{H}\;\AgdaSymbol{:}\;\AgdaFunction{HCont}\;\AgdaSymbol{(}\AgdaBound{A}\;\AgdaOperator{\AgdaInductiveConstructor{⇒}}\;\AgdaBound{B}\AgdaSymbol{)} into a functor \AgdaFunction{napp}\;\AgdaBound{H} from the category of higher-order containers of kind \AgdaBound{A} to that of kind \AgdaBound{B}, generalising \AgdaFunction{app} for second-order containers.
+
+However, this semantics shows that there is no fixpoint operator beyond the second order. Consider the following third-order container, written as the corresponding $\lambda$-term since its encoding as a normal form is not very readable:
+
+\begin{code}%
+\>[0]\AgdaFunction{C}\AgdaSpace{}%
+\AgdaSymbol{:}\AgdaSpace{}%
+\AgdaFunction{HCont}\AgdaSpace{}%
+\AgdaSymbol{(((}\AgdaInductiveConstructor{*}\AgdaSpace{}%
+\AgdaOperator{\AgdaInductiveConstructor{⇒}}\AgdaSpace{}%
+\AgdaInductiveConstructor{*}\AgdaSymbol{)}\AgdaSpace{}%
+\AgdaOperator{\AgdaInductiveConstructor{⇒}}\AgdaSpace{}%
+\AgdaInductiveConstructor{*}\AgdaSymbol{)}\AgdaSpace{}%
+\AgdaOperator{\AgdaInductiveConstructor{⇒}}\AgdaSpace{}%
+\AgdaSymbol{(}\AgdaInductiveConstructor{*}\AgdaSpace{}%
+\AgdaOperator{\AgdaInductiveConstructor{⇒}}\AgdaSpace{}%
+\AgdaInductiveConstructor{*}\AgdaSymbol{)}\AgdaSpace{}%
+\AgdaOperator{\AgdaInductiveConstructor{⇒}}\AgdaSpace{}%
+\AgdaInductiveConstructor{*}\AgdaSymbol{)}\<%
+\\
+\>[0]\AgdaFunction{C}\AgdaSpace{}%
+\AgdaBound{F}\AgdaSpace{}%
+\AgdaBound{G}\AgdaSpace{}%
+\AgdaSymbol{=}\AgdaSpace{}%
+\AgdaBound{G}\AgdaSpace{}%
+\AgdaSymbol{(}\AgdaBound{F}\AgdaSpace{}%
+\AgdaBound{G}\AgdaSymbol{)}\<%
+\end{code}
+
+\noindent
+Suppose there were a third-order fixpoint operator
+\[
+  \AgdaFunction{3W}\;\AgdaSymbol{:}\;\AgdaFunction{HCont}\;\AgdaSymbol{(((}\AgdaInductiveConstructor{*}\;\AgdaOperator{\AgdaInductiveConstructor{⇒}}\;\AgdaInductiveConstructor{*}\AgdaSymbol{)}\;\AgdaOperator{\AgdaInductiveConstructor{⇒}}\;\AgdaInductiveConstructor{*}\AgdaSymbol{)}\;\AgdaOperator{\AgdaInductiveConstructor{⇒}}\;\AgdaSymbol{(}\AgdaInductiveConstructor{*}\;\AgdaOperator{\AgdaInductiveConstructor{⇒}}\;\AgdaInductiveConstructor{*}\AgdaSymbol{)}\;\AgdaOperator{\AgdaInductiveConstructor{⇒}}\;\AgdaInductiveConstructor{*}\AgdaSymbol{)}\;\AgdaSymbol{→}\;\AgdaFunction{HCont}\;\AgdaSymbol{((}\AgdaInductiveConstructor{*}\;\AgdaOperator{\AgdaInductiveConstructor{⇒}}\;\AgdaInductiveConstructor{*}\AgdaSymbol{)}\;\AgdaOperator{\AgdaInductiveConstructor{⇒}}\;\AgdaInductiveConstructor{*}\AgdaSymbol{)}.
+\]
+Then \AgdaFunction{Fix}\;\AgdaSymbol{=}\;\AgdaFunction{3W}\;\AgdaFunction{C} would satisfy \AgdaFunction{Fix}\;\AgdaBound{G}\;\AgdaFunction{≅}\;\AgdaBound{G}\;\AgdaSymbol{(}\AgdaFunction{Fix}\;\AgdaBound{G}\AgdaSymbol{)} for every \AgdaBound{G}; that is, \AgdaFunction{Fix} would be an \emph{internal} fixpoint operator. Under the semantics above, \AgdaFunction{H⟦}\;\AgdaFunction{Fix}\;\AgdaFunction{⟧}, a function of type \AgdaSymbol{(}\AgdaPrimitive{Type}\;\AgdaSymbol{→}\;\AgdaPrimitive{Type}\AgdaSymbol{)}\;\AgdaSymbol{→}\;\AgdaPrimitive{Type} would then yield a fixpoint of every type operator. Taking \AgdaBound{G}\;\AgdaBound{X}\;\AgdaSymbol{=}\;\AgdaBound{X}\;\AgdaSymbol{→}\;\AgdaDatatype{Bool} gives a type isomorphic to its own type of predicates, which is impossible by Cantor's diagonal argument.
+
+We would like to incorporate initial algebras and terminal coalgebras at all kinds, either by adding explicit fixpoint operators to the syntax or by allowing infinite terms (i.e.\ using a coinductively defined syntax). In either case, the naive semantics sketched above has to be given up.
+
+\paragraph{Mixing Higher-Order and Indexed}
+
+It turns out that the higher-order structure is orthogonal to indexing, so our constructions combine freely with indexed containers~\cite{indexedcontainers}. We define a syntax of second-order indexed containers \AgdaKeyword{record}\;\AgdaRecord{2ICont}\;\AgdaSymbol{(}\AgdaBound{I}\;\AgdaBound{J}\;\AgdaSymbol{:}\;\AgdaPrimitive{Type}\AgdaSymbol{)}\;\AgdaSymbol{:}\;\AgdaPrimitive{Type₁}, with a type semantics
+\[
+  \AgdaFunction{2I⟦\_⟧}\;\AgdaSymbol{:}\;\AgdaRecord{2ICont}\;\AgdaBound{I}\;\AgdaBound{J}\;\AgdaSymbol{→}\;\AgdaSymbol{(}\AgdaBound{I}\;\AgdaSymbol{→}\;\AgdaPrimitive{Type}\;\AgdaSymbol{→}\;\AgdaPrimitive{Type}\AgdaSymbol{)}\;\AgdaSymbol{→}\;\AgdaSymbol{(}\AgdaBound{J}\;\AgdaSymbol{→}\;\AgdaPrimitive{Type}\;\AgdaSymbol{→}\;\AgdaPrimitive{Type}\AgdaSymbol{)},
+\]
+a functorial interpretation, and a least fixpoint given by an inductive family:
+\[
+  \begin{array}{l}
+    \AgdaFunction{2Iapp}\;\AgdaSymbol{:}\;\AgdaRecord{2ICont}\;\AgdaBound{I}\;\AgdaBound{J}\;\AgdaSymbol{→}\;\AgdaSymbol{(}\AgdaBound{I}\;\AgdaSymbol{→}\;\AgdaRecord{Cont}\AgdaSymbol{)}\;\AgdaSymbol{→}\;\AgdaBound{J}\;\AgdaSymbol{→}\;\AgdaRecord{Cont}\\
+    \AgdaKeyword{data}\;\AgdaDatatype{2IW}\;\AgdaSymbol{(}\AgdaBound{H}\;\AgdaSymbol{:}\;\AgdaRecord{2ICont}\;\AgdaBound{I}\;\AgdaBound{I}\AgdaSymbol{)}\;\AgdaSymbol{:}\;\AgdaBound{I}\;\AgdaSymbol{→}\;\AgdaPrimitive{Type}\;\AgdaSymbol{→}\;\AgdaPrimitive{Type}
+  \end{array}
+\]
+For example, vectors \AgdaDatatype{Vec}\;\AgdaSymbol{(}\AgdaBound{X}\;\AgdaSymbol{:}\;\AgdaPrimitive{Type}\AgdaSymbol{)}\;\AgdaSymbol{:}\;\AgdaDatatype{ℕ}\;\AgdaSymbol{→}\;\AgdaPrimitive{Type}, indexed by their length, arise as an instance of \AgdaDatatype{2IW}. The same approach generalises to higher-order indexed containers.
+
+\paragraph{Conclusion and Future Work}
+
+We have formalised in Cubical Agda~\cite{cubicalagda} the syntax and semantics of second-order and higher-order containers, including the least and greatest fixpoints of second-order containers. This work is ongoing, and several questions remain open. In particular, we aim to show that W-types remain sufficient: for the second-order case, we conjecture that \AgdaFunction{2W} can be reduced to the first-order \AgdaDatatype{W}, analogously to the reduction of \AgdaFunction{2M} to \AgdaDatatype{M}. We also plan to develop a semantics of higher-order containers together with their fixpoints and recursors.
+
+%% \begin{thebibliography}{9}
+
+%% \bibitem{ahrens2015nonwellfounded}
+%% Benedikt Ahrens, Paolo Capriotti, and R{\'e}gis Spadotti.
+%% \newblock Non-wellfounded trees in homotopy type theory.
+%% \newblock In \emph{13th International Conference on Typed Lambda Calculi and Applications (TLCA 2015)}, volume~38 of \emph{LIPIcs}, pages 17--30, 2015.
+
+%% \bibitem{containers}
+%% Michael Abbott, Thorsten Altenkirch, and Neil Ghani.
+%% \newblock Containers: Constructing strictly positive types.
+%% \newblock \emph{Theoretical Computer Science}, 342(1):3--27, 2005.
+
+%% \bibitem{indexedcontainers}
+%% Thorsten Altenkirch, Neil Ghani, Peter Hancock, Conor McBride, and Peter Morris.
+%% \newblock Indexed containers.
+%% \newblock \emph{Journal of Functional Programming}, 25:e5, 2015.
+
+%% \bibitem{bird1998nested}
+%% Richard Bird and Lambert Meertens.
+%% \newblock Nested datatypes.
+%% \newblock In \emph{Mathematics of Program Construction (MPC 1998)}, volume 1422 of \emph{LNCS}, pages 52--67. Springer, 1998.
+
+%% \bibitem{bird1999generalised}
+%% Richard Bird and Ross Paterson.
+%% \newblock Generalised folds for nested datatypes.
+%% \newblock \emph{Formal Aspects of Computing}, 11(2):200--222, 1999.
+
+%% \bibitem{johann2007initial}
+%% Patricia Johann and Neil Ghani.
+%% \newblock Initial algebra semantics is enough!
+%% \newblock In \emph{Typed Lambda Calculi and Applications (TLCA 2007)}, volume 4583 of \emph{LNCS}, pages 207--222. Springer, 2007.
+
+%% \bibitem{keller2010hereditary}
+%% Chantal Keller and Thorsten Altenkirch.
+%% \newblock Hereditary substitutions for simple types, formalized.
+%% \newblock In \emph{Proceedings of the 3rd Workshop on Mathematically Structured Functional Programming (MSFP 2010)}, pages 3--10. ACM, 2010.
+
+%% \bibitem{cubicalagda}
+%% Andrea Vezzosi, Anders M{\"o}rtberg, and Andreas Abel.
+%% \newblock Cubical {Agda}: A dependently typed programming language with univalence and higher inductive types.
+%% \newblock \emph{Proceedings of the ACM on Programming Languages}, 3(ICFP):87:1--87:29, 2019.
+
+%% \end{thebibliography}
+
+\end{document}

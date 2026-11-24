@@ -1,0 +1,32 @@
+\section{Nested Datatypes: Bush}
+\label{sec:bush}
+
+One motivation for nested datatypes is the representation of function types as terminal coalgebras, that is, as coinductive types. A well-known instance is \AgdaDatatype{ℕ}\;\AgdaSymbol{→}\;\AgdaBound{X}\;\AgdaFunction{≃}\;\AgdaRecord{Stream}\;\AgdaBound{X}, where \AgdaRecord{Stream}\;\AgdaBound{X} is defined coinductively by \AgdaBound{X}\;\AgdaFunction{×}\;\AgdaRecord{Stream}\;\AgdaBound{X}. Now consider binary trees carrying no data at either leaves or nodes:
+
+\input{code/BTree}
+
+The corresponding terminal coalgebra of \AgdaDatatype{BTree}\;\AgdaSymbol{→}\;\AgdaBound{X} is given by the following type:
+
+\input{code/cobush}
+
+The destructor \AgdaField{tail} involves a double application of \AgdaRecord{Bush∞}. In fact, nesting of arbitrary finite depth is required: one can show that the function type out of $n$-ary branching trees \AgdaDatatype{NTree}\;\AgdaSymbol{→}\;\AgdaBound{X} corresponds to a terminal coalgebra \AgdaRecord{Bushⁿ∞} whose destructor \AgdaField{tail} applies \AgdaRecord{Bushⁿ∞} $n$ times. For simplicity and intuition, however, we first consider an inhabited, inductive variant:
+
+\input{code/bush}
+
+This type closely resembles \AgdaDatatype{List}, except for the nested application in \AgdaInductiveConstructor{\_∷\_}. Whereas the signature of \AgdaDatatype{List}\;\AgdaBound{A} can be presented as \AgdaBound{X}\;\AgdaSymbol{↦}\;\AgdaRecord{⊤}\;\AgdaDatatype{⊎}\;\AgdaBound{A}\;\AgdaFunction{×}\;\AgdaBound{X}, the signature of \AgdaDatatype{Bush}\;\AgdaBound{A} cannot be brought into the same form \AgdaBound{X}\;\AgdaSymbol{↦}\;\AgdaRecord{⊤}\;\AgdaDatatype{⊎}\;\AgdaBound{A}\;\AgdaFunction{×}\;\AgdaBound{?} since there is no type that can be placed in the hole \AgdaBound{?} to express the double application. Our solution is to lift the setting to second order: instead of algebras in the category of types, we consider algebras in the category of containers. At the level of types, a second-order signature for \AgdaDatatype{Bush} is given by:
+
+\input{code/bushsig}
+
+This signature abstracts over a function variable \AgdaBound{F}. If we restrict \AgdaBound{F} to be strictly positive, that is, representable by a container, the signature can be expressed as an endofunctor on containers:
+
+\input{code/bushsigcont}
+
+We now construct a container representation of \AgdaDatatype{Bush}. Suppose that \AgdaFunction{Bushᶜ}\;\AgdaSymbol{=}\;\AgdaRecord{S}\;\AgdaInductiveConstructor{◃}\;\AgdaRecord{P} is the initial algebra of \AgdaFunction{SigBushᶜ}. The construction is guided by the following calculation:
+
+\input{code/equationsp}
+
+Reading off the solution of this equation, we define the shapes and positions mutually by induction-induction:
+
+\input{code/bushcont}
+
+The shape \AgdaRecord{S} is inductive because we are constructing an initial algebra; to obtain the terminal coalgebra, it suffices to make it coinductive instead. The position \AgdaRecord{P}, however, should be always inductive, since positions must be finite: you only provide finite terms to a constructor or a field. We prove that \AgdaFunction{Bushᶜ} is indeed the initial algebra of \AgdaFunction{SigBushᶜ}; the proof can be found in our formalization. Finally, the raw \AgdaDatatype{Bush} type, together with its functoriality, can be derived by calling the type interpretation \AgdaFunction{⟦\_⟧} on \AgdaFunction{Bushᶜ}.

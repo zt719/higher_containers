@@ -1,48 +1,46 @@
 \section{Basics}
 \label{sec:basics}
 
-In this section, we review the categorical semantics of simple inductive types by means of a worked example, and then generalize it to containers and W-types. Finally, we introduce the category of containers.
+In this section, we review the categorical semantics of simple inductive types by means of a worked example, and then generalize it to containers and W-types.
 
 \paragraph*{Semantics of Types}
 
-Informally, inductive types are interpreted as initial algebras of endofunctors on \AgdaPrimitive{Type}. For example, the natural numbers together with their constructors \AgdaSymbol{(}\AgdaDatatype{ℕ}\;\AgdaSymbol{,}\;\AgdaInductiveConstructor{[z,s]}\AgdaSymbol{)}\; form the initial algebra of the functor \AgdaDatatype{Maybe}\;\AgdaBound{X}\;\AgdaSymbol{=}\;\AgdaRecord{1}\;\AgdaDatatype{+}\;\AgdaBound{X}. Formally, this means that for any other \AgdaFunction{Maybe}-algebra \AgdaSymbol{(}\AgdaBound{A}\;\AgdaSymbol{,}\;\AgdaBound{α}\AgdaSymbol{)}\;, there exists a unique folding function \AgdaFunction{foldℕ}\;\AgdaSymbol{:}\;\AgdaSymbol{(}\AgdaFunction{Maybe}\;\AgdaGeneralizable{A}\;\AgdaSymbol{→}\;\AgdaGeneralizable{A}\AgdaSymbol{)}\;\AgdaSymbol{→}\;\AgdaDatatype{ℕ}\;\AgdaSymbol{→}\;\AgdaGeneralizable{A}\; such that the following diagram commutes:
+Inductive types are interpreted as initial algebras of endofunctors on types. For example, the type of natural number \AgdaDatatype{ℕ} (together with a function \AgdaFunction{[z,s]}\;\AgdaSymbol{:}\;\AgdaDatatype{Maybe}\;\AgdaDatatype{ℕ}\;\AgdaSymbol{→}\;\AgdaDatatype{ℕ}, which is uniquely represented by its constructors \AgdaInductiveConstructor{zero} and \AgdaInductiveConstructor{suc}) is the initial algebra of \AgdaDatatype{Maybe}. To prove this, it suffices to construct the following:
 
-\input{code/diagrammaybe}
+\input{code/fold_commute_unique}
 
-To formalize this, it suffices to construct two functions: \AgdaFunction{commuteℕ}, which witnesses that \AgdaFunction{foldℕ} is an algebra homomorphism, and \AgdaFunction{uniquefoldℕ}, which establishes its uniqueness. Together, they show that \AgdaDatatype{ℕ} is the initial \AgdaFunction{Maybe}-algebra.
+The folding function \AgdaFunction{foldℕ} and \AgdaFunction{commuteℕ} shows that it is a algebra honomorpshism, and \AgdaFunction{uniquefoldℕ} establishes its uniquness. Together, they show the initiality of natural number.
 
-\paragraph*{Containers and W-types}
+\paragraph*{The Category of Containers}
 
 The functor \AgdaFunction{Maybe} can be regarded as the polynomial $f(x) = 1 + x$ on types. More generally, we may consider infinitary polynomials of the form $f(x) = a₀ + a₁ x + a₂ x² + \cdots$, where each coefficient $aₙ$ is a constant. This leads to the notion of a container:
 
 \input{code/cont}
 
-where the type \AgdaField{S} of \emph{shapes} indexes the monomials, and the family \AgdaField{P} of \emph{positions} gives the exponent of \AgdaBound{X} in each monomial. For example, \AgdaDatatype{Maybe} is represented by \AgdaFunction{Maybeᶜ}\;\AgdaSymbol{=}\;\AgdaDatatype{Bool}\;\AgdaOperator{\AgdaInductiveConstructor{◃}}\;\AgdaFunction{isTrue}, where \AgdaFunction{isTrue} sends \AgdaInductiveConstructor{true} to \AgdaDatatype{⊤} and \AgdaInductiveConstructor{false} to \AgdaDatatype{⊥}. This captures precisely the fact that \AgdaDatatype{Maybe} has two constructors: \AgdaInductiveConstructor{nothing}, which carries no element of \AgdaBound{X}, and \AgdaInductiveConstructor{just}, which carries exactly one. Truely inductive functors, such as \AgdaDatatype{List}, are also containers: \AgdaFunction{Listᶜ}\;\AgdaSymbol{=}\;\AgdaDatatype{ℕ}\;\AgdaOperator{\AgdaInductiveConstructor{◃}}\;\AgdaDatatype{Fin}. Intuitively, it may be viewed as a type with \AgdaBound{n}\;\AgdaSymbol{:}\;\AgdaDatatype{ℕ} many constructors, representing the lists of length \AgdaBound{n}, each of which carries \AgdaDatatype{Fin}\;\AgdaBound{n} many elements of \AgdaBound{X}.
+A container encodes a polynomial functor by its interpretation or extension functor \AgdaFunction{⟦\_⟧}. The type \AgdaField{S} of \emph{shapes} indexes the monomials, and the family \AgdaField{P} of \emph{positions} gives the exponent of \AgdaBound{X} in each monomial. For example, \AgdaDatatype{Maybe} is represented by \AgdaFunction{Maybeᶜ}\;\AgdaSymbol{=}\;\AgdaDatatype{Bool}\;\AgdaOperator{\AgdaInductiveConstructor{◃}}\;\AgdaFunction{isTrue}, where \AgdaFunction{isTrue} sends \AgdaInductiveConstructor{true} to \AgdaDatatype{⊤} and \AgdaInductiveConstructor{false} to \AgdaDatatype{⊥}. This captures precisely the fact that \AgdaDatatype{Maybe} has two constructors: \AgdaInductiveConstructor{nothing}, which carries no element of \AgdaBound{X}, and \AgdaInductiveConstructor{just}, which carries exactly one. Inductive functors, such as \AgdaDatatype{List}, are also containers: \AgdaFunction{Listᶜ}\;\AgdaSymbol{=}\;\AgdaDatatype{ℕ}\;\AgdaOperator{\AgdaInductiveConstructor{◃}}\;\AgdaDatatype{Fin}. Intuitively, it may be viewed as a type with \AgdaDatatype{ℕ} many constructors, each of which represents a list of length \AgdaBound{n} that carries \AgdaDatatype{Fin}\;\AgdaBound{n} many elements of \AgdaBound{X}.
 
-The extension or interpretation of a container decodes it back into the corresponding polynomial functor. We omit the routine proof of functoriality.
-
-\input{code/extension}
-
-Our interest in containers stems from the fact that their initial algebras (and terminal coalgebras) always exist: they are given by \emph{W-types} (and \emph{M-types}, respectively):
-
-\input{code/w}
-
-The initiality of \AgdaSymbol{(}\AgdaDatatype{W}\AgdaSymbol{,} \AgdaInductiveConstructor{sup}\AgdaSymbol{)} is established by constructing the folding function \AgdaFunction{foldW} and proving that, for any other algebra \AgdaSymbol{(}\AgdaBound{A}\AgdaSymbol{,}\AgdaBound{α}\AgdaSymbol{)}, it is the unique map making the following diagram commute:
-
-\input{code/diagramw}
-
-We omit the dual treatment of terminal coalgebras.
-
-\paragraph*{Category of Containers}
-
-We also review the category of containers, as they are crucial for definitions in later sections. Morphisms of containers are defined as follows:
+The morphisms of containers are give by:
 
 \input{code/conthom}
 
-Intuitively, a container morphism encodes a polymorphic function between the corresponding functors. For example, we define \AgdaFunction{head}\;\AgdaSymbol{:}\;\AgdaSymbol{(}\AgdaBound{X}\;\AgdaSymbol{:}\;\AgdaPrimitive{Type}\AgdaSymbol{)}\;\AgdaSymbol{→}\;\AgdaDatatype{List}\;\AgdaBound{X}\;\AgdaSymbol{→}\;\AgdaDatatype{Maybe}\;\AgdaBound{X} to be the total function that returns the first elements from a \AgdaDatatype{List}. Its corresponding container morphism representation \AgdaFunction{headᶜ}\;\AgdaSymbol{:}\;\AgdaDatatype{ℕ}\;\AgdaOperator{\AgdaInductiveConstructor{◃}}\;\AgdaDatatype{Fin}\;\AgdaOperator{\AgdaRecord{→ᶜ}}\;\AgdaDatatype{Bool}\;\AgdaOperator{\AgdaInductiveConstructor{◃}}\;\AgdaDatatype{isTrue}, is described by a map on shapes together with, for each shape, a map on positions. The map on shapes sends \AgdaInductiveConstructor{zero} (empty list) to \AgdaInductiveConstructor{false} (error state); and sends every \AgdaInductiveConstructor{suc}\;\AgdaBound{n} (non-empty list) to \AgdaInductiveConstructor{true} (result state). The map on positions goes in the opposite direction: for each position in the output, it specifies the position in the input from which the data is taken. The empty list case has no output positions, so there is nothing to define. In the non-empty case the single position (result) comes from the  \AgdaInductiveConstructor{fzero}\;\AgdaSymbol{:}\;\AgdaDatatype{Fin}\;\AgdaSymbol{(}\AgdaInductiveConstructor{suc}\;\AgdaBound{n}\AgdaSymbol{)} (the position of the first element of the list).
+Similary, a container morphism encodes a polymorphic function between the corresponding functors along its interpretation \AgdaFunction{⟦\_⟧→ᶜ}. For example, taking \AgdaFunction{head}\;\AgdaSymbol{:}\;\AgdaSymbol{(}\AgdaBound{X}\;\AgdaSymbol{:}\;\AgdaPrimitive{Type}\AgdaSymbol{)}\;\AgdaSymbol{→}\;\AgdaDatatype{List}\;\AgdaBound{X}\;\AgdaSymbol{→}\;\AgdaDatatype{Maybe}\;\AgdaBound{X} as the total function that returns the first elements from a \AgdaDatatype{List}, its corresponding container morphism representation \AgdaFunction{headᶜ}\;\AgdaSymbol{:}\;\AgdaDatatype{ℕ}\;\AgdaOperator{\AgdaInductiveConstructor{◃}}\;\AgdaDatatype{Fin}\;\AgdaOperator{\AgdaRecord{→ᶜ}}\;\AgdaDatatype{Bool}\;\AgdaOperator{\AgdaInductiveConstructor{◃}}\;\AgdaDatatype{isTrue}, is given by a map on shapes: \AgdaFunction{fS}\;\AgdaSymbol{:}\;\AgdaDatatype{ℕ}\;\AgdaSymbol{→}\;\AgdaDatatype{Bool}, together with a reversed map on positions: \AgdaFunction{fP}\;\AgdaSymbol{:}\;\AgdaSymbol{(}\AgdaBound{n}\;\AgdaSymbol{:}\;\AgdaDatatype{ℕ}\AgdaSymbol{)}\;\AgdaSymbol{→}\;\AgdaFunction{isTrue}\;\AgdaSymbol{(}\AgdaFunction{fS}\;\AgdaBound{n}\AgdaSymbol{)}\;\AgdaSymbol{→}\;\AgdaDatatype{Fin}\;\AgdaBound{n}.
 
-Categorically, container morphisms correspond to natural transformations between the associated functors. We define identities \AgdaFunction{idᶜ} and composition \AgdaFunction{\_∘ᶜ\_}, and verify the identity and associativity laws, and hence show that containers and their morphisms form a category. The category of containers has arbitrary products and coproducts. Here we only present the unary and binary cases. It also has monoidal structures:
+Categorically, container morphisms correspond to natural transformations between the associated functors. We can define identities \AgdaFunction{idᶜ} and composition \AgdaFunction{\_∘ᶜ\_}, verify the identity and associativity laws, and hence show that containers and their morphisms form a category.
+
+The category of containers has arbitrary products and coproducts, exponents, and many operaters. For the construction in later sections, we present definitions of the unary and binary products and coproducts, and the monoidal structures:
 
 \input{code/categorical}
 
 The meaning of those operators are straightforward: \AgdaFunction{⊤ᶜ} and \AgdaFunction{⊥ᶜ} are constant functors that always return \AgdaRecord{⊤} and \AgdaDatatype{⊥}; \AgdaFunction{\_×ᶜ\_} and \AgdaFunction{\_⊎ᶜ\_} are binary product and sum of functors; \AgdaFunction{1ᶜ} is the identity functor, while \AgdaFunction{\_⊗ᶜ\_} is composition of functors.
+
+\paragraph*{W-types}
+
+Our interest in containers stems from the fact that their initial algebras always exist: they are given by the W-types:
+
+\input{code/w}
+
+ The inductive definition of \AgdaDatatype{W} forces it to be the initial algebra of \AgdaFunction{⟦}\;\AgdaBound{SP}\;\AgdaFunction{⟧}. Formally, we need to construct the following:
+
+\input{code/fold_commute_unique_W}
+
+The dual of W-types, namely the M-types, are defined as the terminal coalgebras of containers. We omit the details of this dual treatment.

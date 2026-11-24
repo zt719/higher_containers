@@ -1,0 +1,46 @@
+\section{No Fixed-Points Beyond Second Order}
+\label{sec:nogo}
+
+In this section, we sketch an argument showing that, in the present setting,
+W-types beyond \AgdaFunction{2W} cannot exist. Suppose the general higher-order
+W-types exist, that is, we \AgdaKeyword{postulate}
+
+\input{code/hw}
+
+Within the calculus, we can define the signature of the ordinary W-type as a
+higher-order container:
+
+\input{code/sigwc}
+
+morally, \AgdaFunction{SigWᶜ} represents the operation
+\AgdaBound{F}\;\AgdaBound{G}\;\AgdaSymbol{↦}\;\AgdaBound{G}\;\AgdaSymbol{(}\AgdaBound{F}\;\AgdaBound{G}\AgdaSymbol{)}. Combining the two, we obtain a so-called \emph{internal} W-type. By internal, we mean an operator represented as a higher-order container in our calculus.
+
+\input{code/wc}
+
+Correspondingly, the \emph{external} W-type means the functor derived by applying the
+functorial interpretation on the internal one:
+
+\input{code/wext}
+
+Up to the equivalences
+\AgdaFunction{HCont}\;\AgdaSymbol{(}\AgdaInductiveConstructor{*}\;\AgdaOperator{\AgdaInductiveConstructor{⇒}}\;\AgdaInductiveConstructor{*}\AgdaSymbol{)}\;\AgdaSymbol{≃}\;\AgdaRecord{Cont}
+and
+\AgdaFunction{HCont}\;\AgdaInductiveConstructor{*}\;\AgdaSymbol{≃}\;\AgdaPrimitive{Type},
+the external operator \AgdaFunction{W} has type
+\AgdaRecord{Cont}\;\AgdaSymbol{→}\;\AgdaPrimitive{Type} and coincides with the
+ordinary W-type defined inductively using Agda \emph{data} keyword: \AgdaKeyword{data}\;\AgdaDatatype{W}\;\AgdaSymbol{(}\AgdaBound{SP}\;\AgdaSymbol{:}\;\AgdaPostulate{Cont}\AgdaSymbol{)}\;\AgdaSymbol{:}\;\AgdaPrimitive{Type}. This is a satisfying result so far, which means we can present external W-types inside our calculus.
+
+However, if we instead use the type interpretation, we obtain
+
+\input{code/wbad}
+
+which assigns a fixed-point
+\AgdaFunction{W-bad}\;\AgdaBound{F}\;\AgdaSymbol{≃}\;\AgdaBound{F}\;\AgdaSymbol{(}\AgdaFunction{W-bad}\;\AgdaBound{F}\AgdaSymbol{)}
+to \emph{every} function
+\AgdaBound{F}\;\AgdaSymbol{:}\;\AgdaPrimitive{Type}\;\AgdaSymbol{→}\;\AgdaPrimitive{Type}.
+This cannot hold, since fixed-points are only guaranteed to exist for strictly
+positive functors: taking
+\AgdaBound{F}\;\AgdaBound{X}\;\AgdaSymbol{=}\;\AgdaBound{X}\;\AgdaSymbol{→}\;\AgdaDatatype{⊥},
+we would obtain a type \AgdaBound{D} with
+\AgdaBound{D}\;\AgdaSymbol{≃}\;\AgdaSymbol{(}\AgdaBound{D}\;\AgdaSymbol{→}\;\AgdaDatatype{⊥}\AgdaSymbol{)},
+from which \AgdaDatatype{⊥} is derivable. Hence we arrive at a contradiction.

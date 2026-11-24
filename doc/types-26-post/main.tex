@@ -61,15 +61,15 @@
 \begin{abstract}
 Containers represent strictly positive functors on types, and every container
 has an initial algebra (a W-type) and a terminal coalgebra (an M-type). Nested
-datatypes such as \emph{Bush}, however, arise as fixpoints of functors on
+datatypes such as \emph{Bush}, however, arise as fixed-points of functors on
 \emph{containers} rather than on types. We introduce second-order containers,
 which represent such functors, and construct their initial algebras and
 terminal coalgebras (2W and 2M) using induction-induction and
 coinduction-induction. We then generalize to containers at all higher kinds,
 given as normal forms of a simply-typed $\lambda$-calculus representing
-functions on types using infinite products and coproducts. We show that, in this setting, fixpoints
-beyond the second order do not exist: a third-order fixpoint operator would
-yield an internal fixpoint for every type operator, which contradicts Cantor's
+functions on types using infinite products and coproducts. We show that, in this setting, fixed-points
+beyond the second order do not exist: a third-order fixed-point operator would
+yield an internal fixed-point for every type operator, which contradicts Cantor's
 theorem. We discuss ways to overcome this limitation and to further extend
 higher containers. All results are formalized in Cubical Agda.
 \end{abstract}
@@ -77,8 +77,10 @@ higher containers. All results are formalized in Cubical Agda.
 \input{sections/introduction}
 \input{sections/settings}
 \input{sections/basics}
+\input{sections/bush}
 \input{sections/second}
 \input{sections/higher}
+\input{sections/nogo}
 \input{sections/conclusions}
 
 Bibliography

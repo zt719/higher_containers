@@ -1,3 +1,31 @@
 \section{Conclusion and Future Work}
+\label{sec:conclusions}
 
-This is conclusion and future work.
+We have developed a theory of containers at higher kinds. Starting from the nested datatype \AgdaDatatype{Bush}, we observed that its signature becomes an endofunctor on the category of containers once its function variable is restricted to containers. Second-order containers give a syntax for such endofunctors, and we have shown that every second-order container has both an initial algebra \AgdaFunction{2W} and a terminal coalgebra \AgdaFunction{2M}. The main difficulty was to define their shapes and positions in a way that Agda recognizes as strictly positive, which we resolved by a diagonalization trick. We then generalized the syntax to higher-order containers, the normal forms of a simply-typed $λ$-calculus with infinite products and coproducts, and equipped them with both a type and a functor interpretation. However, the existence of fixed-points does not generalize in the same way: the type interpretation applies to arbitrary type operators, including non-positive ones, so fixed-points beyond the second order lead to a contradiction.
+
+We see two main directions for future work.
+
+\paragraph*{Internal Fixed-Points}
+
+The contradiction of Section~\ref{sec:nogo} arises from interpreting an internal W-type over arbitrary functions on types, whereas the functor interpretation gives the expected result. This suggests that higher-order W-types and M-types could be recovered by changing the calculus, rather than by constructing them externally. We plan to extend the syntax with internal fixed-point operators \AgdaInductiveConstructor{μ} and \AgdaInductiveConstructor{ν}, and to derive a new notion of normal form, and hence of higher-order container, that accounts for them. We expect that \AgdaFunction{app} can still be defined as the functor interpretation of the extended calculus, while the type interpretation has to be given up. Since the contradiction depends on the latter, we hope that the resulting theory is consistent.
+
+\paragraph*{Derivatives and the Dirichlet Product}
+
+We would also like to extend our calculus with further operators on containers. The first one is the \emph{derivative}~\cite{AbbottAGM05}. In the first-order case, the derivative of a container is taken with respect to its only variable $x$. Intuitively, it pokes a hole in a tree: a shape of the derivative is a shape of the original container together with a chosen position, the hole, and its positions are all the remaining ones. To tell the hole apart from the other positions, equality of positions has to be decidable, so the operator is defined on the decidable containers \AgdaRecord{DCont}:
+
+\[
+\AgdaFunction{$\partial$}\;\AgdaSymbol{:}\;\AgdaRecord{DCont}\;\AgdaSymbol{→}\;\AgdaRecord{DCont}
+\]
+
+For higher-order containers, we would like to take the derivative with respect to any variable in the context, including function variables.
+
+The second operator is the \emph{Dirichlet product}, which takes the product of both shapes and positions:
+
+\[
+\begin{array}{l}
+\AgdaFunction{DP}\;\AgdaSymbol{:}\;\AgdaRecord{Cont}\;\AgdaSymbol{→}\;\AgdaRecord{Cont}\;\AgdaSymbol{→}\;\AgdaRecord{Cont} \\
+\AgdaFunction{DP}\;\AgdaSymbol{(}\AgdaBound{S}\;\AgdaOperator{\AgdaInductiveConstructor{◃}}\;\AgdaBound{P}\AgdaSymbol{)}\;\AgdaSymbol{(}\AgdaBound{T}\;\AgdaOperator{\AgdaInductiveConstructor{◃}}\;\AgdaBound{Q}\AgdaSymbol{)}\;\AgdaSymbol{=}\;\AgdaBound{S}\;\AgdaFunction{×}\;\AgdaBound{T}\;\AgdaOperator{\AgdaInductiveConstructor{◃}}\;\AgdaSymbol{λ\{}\;\AgdaSymbol{(}\AgdaBound{s}\;\AgdaOperator{\AgdaInductiveConstructor{,}}\;\AgdaBound{t}\AgdaSymbol{)}\;\AgdaSymbol{→}\;\AgdaBound{P}\;\AgdaBound{s}\;\AgdaFunction{×}\;\AgdaBound{Q}\;\AgdaBound{t}\;\AgdaSymbol{\}}
+\end{array}
+\]
+
+By contrast, the product \AgdaFunction{\_×ᶜ\_} takes the disjoint union of positions. Neither the derivative nor the Dirichlet product can be defined internally in our calculus, so both have to be added as primitive operators. It remains to find a notion of normal form that supports them.

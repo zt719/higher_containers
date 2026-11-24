@@ -1,5 +1,5 @@
 \begin{code}
-{-# OPTIONS --cubical --guardedness #-}
+{-# OPTIONS --cubical --guardedness --allow-unsolved-metas #-}
 
 open import Prelude hiding (case)
 open import Agda.Primitive
@@ -23,7 +23,7 @@ data W (SP : Cont) : Type where
 infixr 0 _→ᶜ_
 record _→ᶜ_ (SP TQ : Cont) : Type where
   constructor _◃_
-  open Cont SP
+  open Cont SP using (S; P)
   open Cont TQ renaming (S to T; P to Q)
   field
     fS : S → T
@@ -31,6 +31,9 @@ record _→ᶜ_ (SP TQ : Cont) : Type where
 
 variable
   SP TQ UV : Cont
+
+⟦_⟧→ᶜ : SP →ᶜ TQ → (X : Type) → ⟦ SP ⟧ X → ⟦ TQ ⟧ X
+⟦ fS ◃ fP ⟧→ᶜ X (s , f) = fS s , f ∘ fP s
 
 idᶜ : SP →ᶜ SP
 idᶜ = id ◃ λ s → id
@@ -111,19 +114,16 @@ variable
   A B C : Type ℓ
 \end{code}
 
-\begin{code}
-case : (A → C) → (B → C) → A ⊎ B → C
-case f g (inj₁ a) = f a
-case f g (inj₂ b) = g b
-\end{code}
-
 \begin{code}[hide]
+_$_ : (A → B) → A → B
+f $ a = f a
 
 module Bush-example where
-  mutual
 \end{code}
 
 \begin{code}
+  mutual
+  
     record S : Type where
       inductive
       field
@@ -132,7 +132,7 @@ module Bush-example where
     record P (s : S) : Type where
       inductive
       field
-        desP : case (λ{ tt → ⊥ }) (λ{ (s , f) → ⊤ ⊎ Σ[ p ∈ P s ] P (f p) }) (S.desS s)
+        desP : (λ{ (inj₁ tt) → ⊥ ; (inj₂ (s , f)) → ⊤ ⊎ Σ[ p ∈ P s ] P (f p)}) $ (S.desS s)
 
   Bushᶜ : Cont
   Bushᶜ = S ◃ P
@@ -146,6 +146,17 @@ record 2Cont : Type₁ where
     PX : S → Type
     PF : S → Type
     RF : (s : S) → PF s → 2Cont
+
+record _→²ᶜ_ (H J : 2Cont) : Type₁ where
+  inductive
+  constructor _◃_+_+_
+  open 2Cont H using (S; PX; PF; RF)
+  open 2Cont J renaming (S to T; PX to QX; PF to QF; RF to LF)
+  field
+    fS : S → T
+    fPX : (s : S) → QX (fS s) → PX s
+    fPF : (s : S) → QF (fS s) → PF s
+    fRF : (s : S) (qF : QF (fS s)) → RF s (fPF s qF) →²ᶜ LF (fS s) qF
 
 2⟦_⟧ : 2Cont → (Type → Type) → Type → Type
 2⟦ S ◃ PX + PF + RF ⟧ F X =
@@ -164,27 +175,29 @@ appP (S ◃ PX + PF + RF) (T ◃ Q) (s , f) =
 
 app : 2Cont → Cont → Cont
 app H F = appS H F ◃ appP H F
-\end{code}
 
-\begin{code}[hide]
-module bad2W where
+appS₁ : (H : 2Cont) {TQ UV : Cont}
+        → TQ →ᶜ UV
+        → appS H TQ → appS H UV
+appS₁ (S ◃ PX + PF + RF) (αS ◃ αP) (s , f) =
+  s , λ pF → let (t , g) = f pF in
+    αS t , λ q → appS₁ (RF s pF) (αS ◃ αP) (g (αP t q))
 
-mutual
-\end{code}
+appP₁ : (H : 2Cont) {TQ UV : Cont}
+        (α : TQ →ᶜ UV)
+        (s : appS H TQ) → appP H UV (appS₁ H α s) → appP H TQ s
+appP₁ (S ◃ PX + PF + RF) (αS ◃ αP) (s , f) (inj₁ pX) =
+  inj₁ pX
+appP₁ (S ◃ PX + PF + RF) (αS ◃ αP) (s , f) (inj₂ (pF , q , rp)) =
+  let (t , g) = f pF in
+    inj₂ (pF , αP t q , appP₁ (RF s pF) (αS ◃ αP) (g (αP t q)) rp)
 
-\begin{code}
-  {-# NO_POSITIVITY_CHECK #-}
-  data 2WS (H : 2Cont) : Type where
-    2supS : appS H (2W H) → 2WS H
+app₁ : (H : 2Cont)
+       {TQ UV : Cont}
+       → TQ →ᶜ UV
+       → app H TQ →ᶜ app H UV
+app₁ H α = appS₁ H α ◃ appP₁ H α
 
-  data 2WP (H : 2Cont) (2ws : 2WS H) : Type where
-    2supP⁻ : appP H (2W H) (2supS⁻ 2ws) → 2WP H 2ws
-
-  2W : 2Cont → Cont
-  2W H = 2WS H ◃ 2WP H
-
-  2supS⁻ : {H : 2Cont} → 2WS H → appS H (2W H)
-  2supS⁻ (2supS s) = s
 \end{code}
 
 \begin{code}[hide]
@@ -210,7 +223,6 @@ mutual
              Σ[ q ∈ 2WP-d H H t ] 2WP-d (RF s pF) H (g q))
          → 2WP-d H' H 2ws
 
-{-
 2WS : 2Cont → Type
 2WS H = 2WS-d H H
 
@@ -222,16 +234,22 @@ mutual
 
 2W : 2Cont → Cont
 2W H = 2W-d H H
--}
-\end{code}
 
-\begin{code}
-record MaybeT (M : Type → Type) (X : Type) : Type where
-  constructor mkMaybeT
-  field
-    runMaybeT : M (Maybe X)
+module _ {H : 2Cont} where
 
-data Free (SP : Cont) (X : Type) : Type where
-  pure : X → Free SP X
-  free : ⟦ SP ⟧ (Free SP X) → Free SP X
+  2sup : app H (2W H) →ᶜ 2W H
+  2sup = {!!}
+  
+module _ {H : 2Cont} {TQ : Cont} where
+
+  fold2W : (α : app H TQ →ᶜ TQ) → 2W H →ᶜ TQ
+  fold2W = {!!}
+
+  commute2W : (α : app H TQ →ᶜ TQ) → fold2W α ∘ᶜ 2sup ≡ α ∘ᶜ app₁ H (fold2W α)
+  commute2W = {!!}
+
+  uniquefold2W : (fold2W' : app H TQ →ᶜ TQ → 2W H →ᶜ TQ)
+    → ((α : app H TQ →ᶜ TQ) → fold2W' α ∘ᶜ 2sup ≡ α ∘ᶜ app₁ H (fold2W' α))
+    → fold2W' ≡ fold2W
+  uniquefold2W = {!!}
 \end{code}

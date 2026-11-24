@@ -14,14 +14,17 @@ Fixed points are preserved by cartesian closed pseudofunctors (up to an isomorph
 An internal fixed point operator in a cartesian closed bicategory $ℂ$, is a 1-cell $y : [A,A] → A$, such that $y ≅ id · y (= ev 〈 id  , y 〉)$.
 \end{definition}
 
-\begin{verbatim}
-          y
-    [A,A] ──> A
-     │       ^
-id,y │  ≅   ╱
-     v     ╱  ev
-    [A,A]×A
-\end{verbatim}
+\[
+\begin{tikzcd}[column sep=small]
+  {[A,A]}
+    \arrow[rr, "y", ""{name=Y, below}]
+    \arrow[dr, "{〈\mathrm{id}, y〉}"'] &
+  & A \\
+  & {[A,A] × A}
+    \arrow[ur, "\mathrm{ev}"']
+    \arrow[to=Y, phantom, "≅"] &
+\end{tikzcd}
+\]
 
 \begin{lemma}
 Given an internal fixed point operator $y : [B,B] → B$, and a 1-cell $f : A×B → B$, we obtain an $A$-fixed point $y ∘ Λ f : A → B$ of $f$.

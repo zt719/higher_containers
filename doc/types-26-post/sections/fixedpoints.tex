@@ -1,9 +1,9 @@
-\section{Fixed points in cartesian closed bicategories}
+\section{Fixed Points in Cartesian Closed Bicategories}\label{sec:fixedpoints}
 
-Taking a step back from the specific notions of this paper, we can consider abstractly the question of existence of fixed points, and obtain a no-go theorem for the naïve setup where the kind ∗ is interpreted as \AgdaPrimitive{Type} and function types are preserved by the semantics, so that for instance the interpretation of a container, $C$ of kind $(∗ → ∗) → ∗$ becomes an operation \AgdaSymbol{(}\AgdaPrimitive{Type}\;\AgdaSymbol{→}\;\AgdaPrimitive{Type}\AgdaSymbol{)}\;\AgdaSymbol{→}\;\AgdaPrimitive{Type}. Our chosen setting here is the notion of a cartesian closed bicategory, and the naïve semantics would be a cartesian closed pseudo-functor into the kinds-as-types bicategory described below.
+Taking a step back from the specific notions of this paper, we can consider abstractly the question of the existence of fixed points, and obtain a no-go theorem for the naïve setup where the kind ∗ is interpreted as \AgdaPrimitive{Type} and function types are preserved by the semantics, so that for instance the interpretation of a container $C$ of kind $(∗ → ∗) → ∗$ becomes an operation \AgdaSymbol{(}\AgdaPrimitive{Type}\;\AgdaSymbol{→}\;\AgdaPrimitive{Type}\AgdaSymbol{)}\;\AgdaSymbol{→}\;\AgdaPrimitive{Type}. Our chosen setting here is the notion of a cartesian closed bicategory, and the naïve semantics would be a cartesian closed pseudofunctor into the kinds-as-types bicategory described below.
 
 \begin{definition}
-Let $f : A×B → B$ be a 1-cell in a cartesian closed bicategory $ℂ$. An $A$-fixed point of $f$ is a 1-cell $x : A → B$ such that $f ∘ 〈id , x 〉≅ x$.
+Let $f : A×B → B$ be a 1-cell in a cartesian closed bicategory $ℂ$. An $A$-fixed point of $f$ is a 1-cell $x : A → B$ such that $f ∘ 〈\mathrm{id}, x〉 ≅ x$.
 \end{definition}
 
 \begin{lemma}
@@ -11,7 +11,7 @@ Fixed points are preserved by cartesian closed pseudofunctors (up to an isomorph
 \end{lemma}
 
 \begin{definition}
-An internal fixed point operator in a cartesian closed bicategory $ℂ$, is a 1-cell $y : [A,A] → A$, such that $y ≅ id · y (= ev 〈 id  , y 〉)$.
+An internal fixed point operator in a cartesian closed bicategory $ℂ$ is a 1-cell $y : [A,A] → A$, such that $y ≅ \mathrm{id} · y \; (= \mathrm{ev} ∘ 〈\mathrm{id}, y〉)$.
 \end{definition}
 
 \[
@@ -31,11 +31,11 @@ Given an internal fixed point operator $y : [B,B] → B$, and a 1-cell $f : A×B
 \end{lemma}
 
 \begin{lemma}
-An internal fixed point operator is exactly an $[A,A]$-fixed point of $ev : [A,A]×A → A$.
+An internal fixed point operator is exactly an $[A,A]$-fixed point of $\mathrm{ev} : [A,A]×A → A$.
 \end{lemma}
 
 \begin{proposition}
-A product preserving pseudofuncto preserves internal fixed point operators (up to an isomorphism).
+A product preserving pseudofunctor preserves internal fixed point operators (up to an isomorphism).
 \end{proposition}
 
 \begin{definition}
@@ -43,13 +43,14 @@ In any cartesian closed bicategory $ℂ$ and any 0-cell $A$ in it, let $Φ_A$ be
 \end{definition}
 
 \begin{lemma}
-Any fixed point operator $y : [A,A] → A$ gives rise to a $1$-fixed point $⌜y⌝ : 1 → [[A,A],A]$ of $Φ_A$. Conversely, every $1$-fixed point $r : 1 → [[A,A],A]$ of $Φ_A$ gives rise to a fixed point operator $⌞r⌟ : [A,A] → A$.
+Any internal fixed point operator $y : [A,A] → A$ gives rise to a $1$-fixed point $⌜y⌝ : 1 → [[A,A],A]$ of $Φ_A$. Conversely, every $1$-fixed point $r : 1 → [[A,A],A]$ of $Φ_A$ gives rise to an internal fixed point operator $⌞r⌟ : [A,A] → A$.
 \end{lemma}
 
-\textbf{Remark:} Since λ-terms are essentially preserved by cartesian closed pseudo-functors, so is $Φ_A$ (up to a relating isomorphism).
+\textbf{Remark:} Since λ-terms are essentially preserved by cartesian closed
+pseudofunctors, so is $Φ_A$ (up to a relating isomorphism).
 
 \begin{proposition}
-A cartesian closed bicategory with fixed points for all maps $[[A,A],A] → [[A,A],A]$, has a fixed point operator $y : [A,A] → A$ I.e. an external fixed point operation of rank $n+2$ gives rise to an internal fixed point operation of rank $n$.
+A cartesian closed bicategory with fixed points for all maps $[[A,A],A] → [[A,A],A]$ has an internal fixed point operator $y : [A,A] → A$. I.e. an external fixed point operation of rank $n+2$ gives rise to an internal fixed point operation of rank $n$.
 \end{proposition}
 
 \begin{definition}
@@ -61,5 +62,5 @@ $\mathcal{T}$ has no internal fixed point operator for $[[∗,∗],∗]$.
 \end{lemma}
 
 \begin{theorem}
-No cartesian closed bicategory ℂ with a cartesian closed pseudofunctor $F : ℂ → \mathcal{T}$ can have a fixed point for $Φ_A$ for any $A$ such that $F␣A ≅ ∗$.
+No cartesian closed bicategory $ℂ$ with a cartesian closed pseudofunctor $F : ℂ → \mathcal{T}$ can have a fixed point for $Φ_A$ for any $A$ such that $F␣A ≅ ∗$.
 \end{theorem}

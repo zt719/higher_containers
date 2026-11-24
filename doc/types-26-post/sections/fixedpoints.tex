@@ -40,6 +40,10 @@ For an endomorphism $g : B → B$, a $1$-fixed point of $g ∘ π₂ : 1×B → 
 \label{lem:fixed-preserved} A cartesian closed functor $F : ℂ → 𝔻$ maps $A$-fixed points in $ℂ$ to $F␣A$-fixed points in $𝔻$.
 \end{lemma}
 
+\begin{proof}
+Let $x$ be an $A$-fixed point of $f : A×B → B$. We show that $F␣x$ is an $F␣A$-fixed point of $F␣f ∘ q$, where $q$ is any inverse of the canonical comparison map $F␣(A×B) → F␣A × F␣B$: \[F␣f ∘ q ∘ 〈\id, F␣x〉 = F␣f ∘ F␣〈\id, x〉 = F␣(f ∘ 〈\id, x〉) = F␣x.\]
+\end{proof}
+
 \begin{definition}
 An \emph{internal fixed point operator} on an object $A$ of a cartesian closed wild category $ℂ$ is a morphism $y : [A,A] → A$ together with an identification $\id · y = y$.
 \end{definition}
@@ -60,11 +64,21 @@ An \emph{internal fixed point operator} on an object $A$ of a cartesian closed w
 Given an internal fixed point operator $y$ on $B$, every morphism $f : A×B → B$ yields an $A$-fixed point $y ∘ Λ f$.
 \end{lemma}
 
+\begin{proof}
+\[f ∘ 〈\id, y ∘ Λ f〉 = \ev ∘ 〈Λ f, y ∘ Λ f〉 = \ev ∘ 〈\id, y〉 ∘ Λ f
+  = y ∘ Λ f.\]
+\end{proof}
+
 Unfolding the notation, an internal fixed point operator on $A$ is exactly an $[A,A]$-fixed point of $\ev : [A,A]×A → A$.
 
 \begin{proposition}
 \label{prop:operator-preserved} A cartesian closed functor $F : ℂ → 𝔻$ maps internal fixed point operators on $A$ to internal fixed point operators on $F␣A$.
 \end{proposition}
+
+\begin{proof}
+Let $y$ be an internal fixed point operator on $A$. We show that $F␣y ∘ m$ is an internal fixed point operator on $F␣A$, where $m$ is any inverse of the canonical comparison map $c : F␣[A,A] → [F␣A,F␣A]$: \[\ev ∘ 〈\id, F␣y ∘ m〉 = \ev ∘ 〈c, F␣y〉 ∘ m
+= F␣\ev ∘ q ∘ 〈\id, F␣y〉 ∘ m = F␣y ∘ m.\] Here $q$ is as in the proof of Lemma \ref{lem:fixed-preserved}, so that $c = Λ(F␣\ev ∘ q)$, and the last step is that lemma applied to $y$ as an $[A,A]$-fixed point of $\ev$.
+\end{proof}
 
 \begin{definition}
 For an object $A$ of a cartesian closed wild category, let $Φ_A : [[A,A],A] → [[A,A],A]$ be the morphism $Λ(π₂ · (π₁ · π₂))$ (which is $λ M f. f (M f)$, via the Curry--Howard--Lambek correspondence).
@@ -74,11 +88,20 @@ For an object $A$ of a cartesian closed wild category, let $Φ_A : [[A,A],A] →
 \label{lem:names} The map $⌜-⌝ : \Hom_ℂ([A,A],A) → \Hom_ℂ(1,[[A,A],A])$ is an equivalence, and lifts to an equivalence between the internal fixed point operators on $A$ and the $1$-fixed points of $Φ_A ∘ π₂$.
 \end{lemma}
 
+\begin{proof}
+That $⌜-⌝$ is an equivalence was noted above. For the lift, it suffices that $Φ_A ∘ ⌜y⌝ = ⌜\id · y⌝$ for every $y : [A,A] → A$: \[Φ_A ∘ ⌜y⌝ = Λ(π₂ · ((⌜y⌝ ∘ π₁) · π₂)) = Λ(π₂ · (y ∘ π₂))
+= Λ((\id · y) ∘ π₂) = ⌜\id · y⌝.\]
+\end{proof}
+
 \textbf{Remark:} Proposition \ref{prop:operator-preserved} can also be proved through $Φ_A$. Being given by a $λ$-term, $Φ_A$ is preserved by cartesian closed functors up to the comparison isomorphisms. So such a functor $F$ maps $1$-fixed points of $Φ_A ∘ π₂$ to $1$-fixed points of $Φ_{F␣A} ∘ π₂$, which by Lemma \ref{lem:names} are the internal fixed point operators on $F␣A$.
 
 \begin{proposition}
 A cartesian closed wild category with $1$-fixed points of $g ∘ π₂$ for all morphisms $g : [[A,A],A] → [[A,A],A]$ has an internal fixed point operator on $A$. I.e. an external fixed point operation of order $n+2$ gives rise to an internal fixed point operation of order $n$.
 \end{proposition}
+
+\begin{proof}
+Take $g ≔ Φ_A$ and apply Lemma \ref{lem:names}.
+\end{proof}
 
 \begin{definition}
 Let $\mathcal{T}$ be the wild category of large types: its objects are the types of the universe $\AgdaPrimitive{Type₁}$, among them $\AgdaPrimitive{Type}$, and its morphisms are functions. It is cartesian closed, with the unit type, product types and function types.
@@ -88,8 +111,17 @@ Let $\mathcal{T}$ be the wild category of large types: its objects are the types
 \label{lem:no-operator} $\mathcal{T}$ has no internal fixed point operator on $\AgdaPrimitive{Type}$.
 \end{lemma}
 
+\begin{proof}
+Such an operator $y$ would give, for $D ≔ y␣(λ X. X → ⊥)$, an identification $(D → ⊥) = D$, from which $⊥$ is derivable.
+\end{proof}
+
 \begin{theorem}
 Let $F : ℂ → \mathcal{T}$ be a cartesian closed functor and $∗$ an object of $ℂ$ with $F␣∗ ≃ \AgdaPrimitive{Type}$. Then $Φ_∗ ∘ π₂$ has no $1$-fixed point in $ℂ$.
 \end{theorem}
+
+\begin{proof}
+Let $e : F␣∗ ≃ \AgdaPrimitive{Type}$, and suppose $r$ is a $1$-fixed point of $Φ_∗ ∘ π₂$. By Lemma \ref{lem:names} and Proposition \ref{prop:operator-preserved} there is an internal fixed point operator $y$ on $F␣∗$. Then $λ g. e␣(y␣(e^{-1} ∘ g ∘ e))$ is one on $\AgdaPrimitive{Type}$, contradicting Lemma \ref{lem:no-operator}.
+\end{proof}
+
 
 

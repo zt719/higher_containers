@@ -1,66 +1,95 @@
-\section{Fixed Points in Cartesian Closed Bicategories}\label{sec:fixedpoints}
+\section{Fixed Points in Cartesian Closed Wild Categories}\label{sec:fixedpoints}
 
-Taking a step back from the specific notions of this paper, we can consider abstractly the question of the existence of fixed points, and obtain a no-go theorem for the naïve setup where the kind ∗ is interpreted as \AgdaPrimitive{Type} and function types are preserved by the semantics, so that for instance the interpretation of a container $C$ of kind $(∗ → ∗) → ∗$ becomes an operation \AgdaSymbol{(}\AgdaPrimitive{Type}\;\AgdaSymbol{→}\;\AgdaPrimitive{Type}\AgdaSymbol{)}\;\AgdaSymbol{→}\;\AgdaPrimitive{Type}. Our chosen setting here is the notion of a cartesian closed bicategory, and the naïve semantics would be a cartesian closed pseudofunctor into the kinds-as-types bicategory described below.
+Taking a step back from the specific notions of this paper, we can consider abstractly the question of the existence of fixed points, and obtain a no-go theorem for the naïve setup where the kind ∗ is interpreted as \AgdaPrimitive{Type} and function types are preserved by the semantics, so that for instance the interpretation of a container $C$ of kind $(∗ → ∗) → ∗$ becomes an operation \AgdaSymbol{(}\AgdaPrimitive{Type}\;\AgdaSymbol{→}\;\AgdaPrimitive{Type}\AgdaSymbol{)}\;\AgdaSymbol{→}\;\AgdaPrimitive{Type}. Our chosen setting here is the notion of a cartesian closed wild category, and the naïve semantics would be a cartesian closed functor into the wild category of large types, sending the kind ∗ to \AgdaPrimitive{Type}.
 
 \begin{definition}
-Let $f : A×B → B$ be a 1-cell in a cartesian closed bicategory $ℂ$. An $A$-fixed point of $f$ is a 1-cell $x : A → B$ such that $f ∘ 〈\mathrm{id}, x〉 ≅ x$.
+A wild category $ℂ$, with $\Hom_ℂ(A,B)$ the type of morphisms from $A$ to $B$, is \emph{cartesian closed} if it is equipped with the following.
+
+\begin{itemize}
+\item
+  A terminal object $1$: the type $\Hom_ℂ(C,1)$ is contractible for every object $C$. We write ${!} : C → 1$ for its unique morphism.
+\item
+  For all objects $A$ and $B$, a product $A×B$ with projections $π₁ : A×B → A$ and $π₂ : A×B → B$, such that $h ↦ (π₁ ∘ h, π₂ ∘ h)$ is an equivalence $\Hom_ℂ(C,A×B) ≃ \Hom_ℂ(C,A) × \Hom_ℂ(C,B)$ for every object $C$. We write $〈f,g〉 : C → A×B$ for the morphism corresponding to $f : C → A$ and $g : C → B$.
+\item
+  For all objects $A$ and $B$, an exponential $[A,B]$ with evaluation $\ev : [A,B]×A → B$, such that $h ↦ \ev ∘ 〈h ∘ π₁, π₂〉$ is an equivalence $\Hom_ℂ(C,[A,B]) ≃ \Hom_ℂ(C×A,B)$ for every object $C$. We write $Λ f : C → [A,B]$ for the morphism corresponding to $f : C×A → B$, and $g · a ≔ \ev ∘ 〈g,a〉 : C → B$ for the application of $g : C → [A,B]$ to $a : C → A$.
+\end{itemize}
 \end{definition}
 
+A morphism $f : A → B$ has a \emph{name} $⌜f⌝ ≔ Λ(f ∘ π₂) : 1 → [A,B]$, where $π₂ : 1×A → A$. Conversely, a morphism $r : 1 → [A,B]$ determines the morphism $⌞r⌟ ≔ (r ∘ {!}) · \id : A → B$. These two operations are mutually inverse.
+
+\begin{definition}
+A \emph{functor} $F : ℂ → 𝔻$ of wild categories consists of an object $F␣A$ of $𝔻$ for every object $A$ of $ℂ$, and a morphism $F␣f : F␣A → F␣B$ for every morphism $f : A → B$, with identifications $F␣\id = \id$ and $F␣(g ∘ f) = F␣g ∘ F␣f$. A functor between cartesian closed wild categories is \emph{cartesian closed} if the following morphisms are isomorphisms, for all objects $A$ and $B$ of $ℂ$.
+
+\begin{itemize}
+\item
+  The unique morphism ${!} : F␣1 → 1$.
+\item
+  The morphism $〈F␣π₁, F␣π₂〉 : F␣(A×B) → F␣A × F␣B$.
+\item
+  The morphism $Λ(F␣\ev ∘ 〈F␣π₁, F␣π₂〉^{-1}) : F␣[A,B] → [F␣A, F␣B]$.
+\end{itemize}
+\end{definition}
+
+\begin{definition}
+Let $f : A×B → B$ be a morphism in a cartesian closed wild category $ℂ$. An \emph{$A$-fixed point} of $f$ is a morphism $x : A → B$ together with an identification $f ∘ 〈\id, x〉 = x$.
+\end{definition}
+
+For an endomorphism $g : B → B$, a $1$-fixed point of $g ∘ π₂ : 1×B → B$ amounts to a morphism $x : 1 → B$ with an identification $g ∘ x = x$. In the wild category of large types, for instance, a $1$-fixed point of $F ∘ π₂$ for a function $F : \AgdaPrimitive{Type} → \AgdaPrimitive{Type}$ amounts by univalence to a type $X$ together with an equivalence $F␣X ≃ X$.
+
 \begin{lemma}
-Fixed points are preserved by cartesian closed pseudofunctors (up to an isomorphism).
+\label{lem:fixed-preserved} A cartesian closed functor $F : ℂ → 𝔻$ maps $A$-fixed points in $ℂ$ to $F␣A$-fixed points in $𝔻$.
 \end{lemma}
 
 \begin{definition}
-An internal fixed point operator in a cartesian closed bicategory $ℂ$ is a 1-cell $y : [A,A] → A$, such that $y ≅ \mathrm{id} · y \; (= \mathrm{ev} ∘ 〈\mathrm{id}, y〉)$.
+An \emph{internal fixed point operator} on an object $A$ of a cartesian closed wild category $ℂ$ is a morphism $y : [A,A] → A$ together with an identification $\id · y = y$.
 \end{definition}
 
 \[
 \begin{tikzcd}[column sep=small]
   {[A,A]}
     \arrow[rr, "y", ""{name=Y, below}]
-    \arrow[dr, "{〈\mathrm{id}, y〉}"'] &
+    \arrow[dr, "{〈\id, y〉}"'] &
   & A \\
   & {[A,A] × A}
-    \arrow[ur, "\mathrm{ev}"']
-    \arrow[to=Y, phantom, "≅"] &
+    \arrow[ur, "\ev"']
+    \arrow[to=Y, phantom, "="] &
 \end{tikzcd}
 \]
 
 \begin{lemma}
-Given an internal fixed point operator $y : [B,B] → B$, and a 1-cell $f : A×B → B$, we obtain an $A$-fixed point $y ∘ Λ f : A → B$ of $f$.
+Given an internal fixed point operator $y$ on $B$, every morphism $f : A×B → B$ yields an $A$-fixed point $y ∘ Λ f$.
 \end{lemma}
 
-\begin{lemma}
-An internal fixed point operator is exactly an $[A,A]$-fixed point of $\mathrm{ev} : [A,A]×A → A$.
-\end{lemma}
+Unfolding the notation, an internal fixed point operator on $A$ is exactly an $[A,A]$-fixed point of $\ev : [A,A]×A → A$.
 
 \begin{proposition}
-A cartesian closed pseudofunctor preserves internal fixed point operators (up to an isomorphism).
+\label{prop:operator-preserved} A cartesian closed functor $F : ℂ → 𝔻$ maps internal fixed point operators on $A$ to internal fixed point operators on $F␣A$.
 \end{proposition}
 
 \begin{definition}
-In any cartesian closed bicategory $ℂ$ and any 0-cell $A$ in it, let $Φ_A$ be the map $Φ_A : [[A,A],A] → [[A,A],A]$, defined by $Φ_A = Λ(π₂ · (π₁ · π₂))$ (which is $λ M f. f (M f)$, via the Curry--Howard correspondence).
+For an object $A$ of a cartesian closed wild category, let $Φ_A : [[A,A],A] → [[A,A],A]$ be the morphism $Λ(π₂ · (π₁ · π₂))$ (which is $λ M f. f (M f)$, via the Curry--Howard--Lambek correspondence).
 \end{definition}
 
 \begin{lemma}
-Any internal fixed point operator $y : [A,A] → A$ gives rise to a $1$-fixed point $⌜y⌝ : 1 → [[A,A],A]$ of $Φ_A$. Conversely, every $1$-fixed point $r : 1 → [[A,A],A]$ of $Φ_A$ gives rise to an internal fixed point operator $⌞r⌟ : [A,A] → A$.
+\label{lem:names} The map $⌜-⌝ : \Hom_ℂ([A,A],A) → \Hom_ℂ(1,[[A,A],A])$ is an equivalence, and lifts to an equivalence between the internal fixed point operators on $A$ and the $1$-fixed points of $Φ_A ∘ π₂$.
 \end{lemma}
 
-\textbf{Remark:} Since λ-terms are essentially preserved by cartesian closed
-pseudofunctors, so is $Φ_A$ (up to a relating isomorphism).
+\textbf{Remark:} Proposition \ref{prop:operator-preserved} can also be proved through $Φ_A$. Being given by a $λ$-term, $Φ_A$ is preserved by cartesian closed functors up to the comparison isomorphisms. So such a functor $F$ maps $1$-fixed points of $Φ_A ∘ π₂$ to $1$-fixed points of $Φ_{F␣A} ∘ π₂$, which by Lemma \ref{lem:names} are the internal fixed point operators on $F␣A$.
 
 \begin{proposition}
-A cartesian closed bicategory with $1$-fixed points for all maps $[[A,A],A] → [[A,A],A]$ has an internal fixed point operator $y : [A,A] → A$. I.e. an external fixed point operation of rank $n+2$ gives rise to an internal fixed point operation of rank $n$.
+A cartesian closed wild category with $1$-fixed points of $g ∘ π₂$ for all morphisms $g : [[A,A],A] → [[A,A],A]$ has an internal fixed point operator on $A$. I.e. an external fixed point operation of order $n+2$ gives rise to an internal fixed point operation of order $n$.
 \end{proposition}
 
 \begin{definition}
-Let $\mathcal{T}$ be the bicategory with 0-cells being lists of kinds (representing products), 1-cells $\mathcal{T} {\vec k}␣{\vec l} ≔ \AgdaPrimitive{Type}{\vec k} → \AgdaPrimitive{Type}{\vec l}$ and 2-cells $\mathcal{T}{\vec k}␣{\vec l}␣f␣g = ∏_{x: \AgdaPrimitive{Type}{\vec k}}\big(f␣x → g␣x\big)$.
+Let $\mathcal{T}$ be the wild category of large types: its objects are the types of the universe $\AgdaPrimitive{Type₁}$, among them $\AgdaPrimitive{Type}$, and its morphisms are functions. It is cartesian closed, with the unit type, product types and function types.
 \end{definition}
 
 \begin{lemma}
-$\mathcal{T}$ has no internal fixed point operator for $[[∗,∗],∗]$.
+\label{lem:no-operator} $\mathcal{T}$ has no internal fixed point operator on $\AgdaPrimitive{Type}$.
 \end{lemma}
 
 \begin{theorem}
-No cartesian closed bicategory $ℂ$ with a cartesian closed pseudofunctor $F : ℂ → \mathcal{T}$ can have a fixed point for $Φ_A$ for any $A$ such that $F␣A ≅ ∗$.
+Let $F : ℂ → \mathcal{T}$ be a cartesian closed functor and $∗$ an object of $ℂ$ with $F␣∗ ≃ \AgdaPrimitive{Type}$. Then $Φ_∗ ∘ π₂$ has no $1$-fixed point in $ℂ$.
 \end{theorem}
+
+
